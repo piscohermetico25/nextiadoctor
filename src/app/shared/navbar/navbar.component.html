@@ -14,24 +14,7 @@
 
     <div class="collapse navbar-collapse" [ngClass]="{'show': !isMenuCollapsed}">
       <ul class="navbar-nav ms-auto nav-professional d-flex align-items-center">
-        <li class="nav-item">
-          <a class="nav-link nav-link-professional" routerLink="/home" routerLinkActive="active">
-            <i class="bi bi-house-fill nav-icon"></i>
-            <span>Inicio</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link nav-link-professional" routerLink="/about" routerLinkActive="active">
-            <i class="bi bi-info-circle-fill nav-icon"></i>
-            <span>Acerca de</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link nav-link-professional" routerLink="/contact" routerLinkActive="active">
-            <i class="bi bi-envelope-fill nav-icon"></i>
-            <span>Contacto</span>
-          </a>
-        </li>
+  
         <!-- Usuario no autenticado -->
         <li class="nav-item dropdown" *ngIf="!isAuthenticated">
           <a class="nav-link nav-link-professional dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
