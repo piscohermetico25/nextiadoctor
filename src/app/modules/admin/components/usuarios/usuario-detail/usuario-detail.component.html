@@ -1,0 +1,160 @@
+<app-page-header
+  title="Detalle de Usuario"
+  subtitle="Información completa del usuario del sistema"
+  icon="bi bi-person-fill"
+  actionType="button"
+  actionText="Volver a Lista"
+  actionRoute="/admin/usuarios"
+  actionIcon="bi bi-arrow-left"
+  primaryColor="#28a745"
+  secondaryColor="#1e7e34"
+  [showAction]="true">
+</app-page-header>
+
+<div class="usuario-detail-container">
+
+  <div class="content-section">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Cargando información del usuario...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <i class="error-icon bi bi-exclamation-triangle-fill"></i>
+      <p class="error-text">{{ error }}</p>
+    </div>
+
+    <div *ngIf="!loading && !error && usuario" class="row">
+      <div class="col-md-8">
+        <!-- Información Principal -->
+        <div class="detail-card">
+          <div class="card-header">
+            <div class="header-content">
+              <div class="usuario-avatar">
+                {{ getInitials(usuario.nombre) }}
+              </div>
+              <div class="usuario-info">
+                <h2>{{ usuario.nombre }}</h2>
+                <div class="badges">
+                  <span class="badge badge-type" [ngClass]="getTipoBadgeClass(usuario.tipo_usuario)">
+                    <i [ngClass]="getTipoIcon(usuario.tipo_usuario)"></i>
+                    {{ getTipoLabel(usuario.tipo_usuario) }}
+                  </span>
+                  <span class="badge" [ngClass]="usuario.activo ? 'badge-active' : 'badge-inactive'">
+                    <i class="bi" [ngClass]="usuario.activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="bi bi-envelope"></i>
+                </div>
+                <div class="info-content">
+                  <div class="info-label">Email</div>
+                  <div class="info-value">
+                    <a href="mailto:{{ usuario.email }}">{{ usuario.email }}</a>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="info-item" *ngIf="usuario.telefono">
+                <div class="info-icon">
+                  <i class="bi bi-telephone"></i>
+                </div>
+                <div class="info-content">
+                  <div class="info-label">Teléfono</div>
+                  <div class="info-value">
+                    <a href="tel:{{ usuario.telefono }}">{{ usuario.telefono }}</a>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="bi bi-calendar"></i>
+                </div>
+                <div class="info-content">
+                  <div class="info-label">Fecha de Registro</div>
+                  <div class="info-value">{{ usuario.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+              </div>
+              
+              <div class="info-item" *ngIf="usuario.tipo_usuario === 'IPRESS_ADMIN' && ipress">
+                <div class="info-icon">
+                  <i class="bi bi-building"></i>
+                </div>
+                <div class="info-content">
+                  <div class="info-label">IPRESS Asociada</div>
+                  <div class="info-value">
+                    <a [routerLink]="['/admin/ipress/detail', ipress.id]">{{ ipress.nombre }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="col-md-4">
+      <!-- Acciones Rápidas -->
+      <div class="actions-card">
+        <div class="card-header">
+          <h5 class="card-title">
+            <i class="bi bi-lightning me-2"></i>
+            Acciones Rápidas
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="action-buttons">
+            <button class="action-btn action-primary" [routerLink]="['/admin/usuarios/edit', usuario.id]">
+              <div class="action-icon">
+                <i class="bi bi-pencil"></i>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Editar Usuario</div>
+                <div class="action-description">Modificar información</div>
+              </div>
+            </button>
+            
+            <button *ngIf="usuario.tipo_usuario === 'MEDICO'" class="action-btn action-info" [routerLink]="['/admin/medicos/usuario', usuario.id]">
+              <div class="action-icon">
+                <i class="bi bi-clipboard2-pulse"></i>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Ver Perfil Médico</div>
+                <div class="action-description">Información médica</div>
+              </div>
+            </button>
+            
+            <button *ngIf="usuario.tipo_usuario === 'IPRESS_ADMIN' && ipress" class="action-btn action-info" [routerLink]="['/admin/ipress/detail', ipress.id]">
+              <div class="action-icon">
+                <i class="bi bi-building"></i>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Ver IPRESS</div>
+                <div class="action-description">{{ ipress.nombre }}</div>
+              </div>
+            </button>
+            
+            <button class="action-btn action-warning" disabled>
+              <div class="action-icon">
+                <i class="bi bi-lock"></i>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Restablecer Contraseña</div>
+                <div class="action-description">Próximamente</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

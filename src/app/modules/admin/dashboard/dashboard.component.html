@@ -1,0 +1,380 @@
+<div class="dashboard-container">
+  <!-- Welcome Header -->
+  <div class="welcome-header mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="dashboard-title mb-2">
+          <i class="bi bi-speedometer2 me-3"></i>
+          Bienvenido al Panel de Administración
+        </h1>
+        <p class="dashboard-subtitle mb-0">Gestiona eficientemente todos los aspectos de NextiaDoctor</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="dashboard-date">
+          <i class="bi bi-calendar3 me-2"></i>
+          {{ currentDate | date:'fullDate':'es-ES' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-card">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <h5>Cargando datos del dashboard...</h5>
+      <p class="text-muted">Por favor espera mientras obtenemos la información más reciente</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger alert-modern">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+      <div class="flex-grow-1">
+        <h6 class="mb-1">Error al cargar los datos</h6>
+        <p class="mb-0">{{ error }}</p>
+      </div>
+      <button class="btn btn-outline-danger" (click)="loadDashboardData()">
+        <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row stats-row" *ngIf="!loading && !error">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card stats-card-primary">
+        <div class="stats-card-body">
+          <div class="stats-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="stats-content">
+            <div class="stats-number">{{ usuariosCount }}</div>
+            <div class="stats-label">Total Usuarios</div>
+            <div class="stats-trend">
+              <i class="bi bi-arrow-up"></i>
+              <span>+12% este mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-footer">
+          <a [routerLink]="['/admin/usuarios']" class="stats-link">
+            Ver detalles <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card stats-card-success">
+        <div class="stats-card-body">
+          <div class="stats-icon">
+            <i class="bi bi-heart-pulse-fill"></i>
+          </div>
+          <div class="stats-content">
+            <div class="stats-number">{{ medicosCount }}</div>
+            <div class="stats-label">Médicos Activos</div>
+            <div class="stats-trend">
+              <i class="bi bi-arrow-up"></i>
+              <span>+8% este mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-footer">
+          <a [routerLink]="['/admin/medicos']" class="stats-link">
+            Ver detalles <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card stats-card-info">
+        <div class="stats-card-body">
+          <div class="stats-icon">
+            <i class="bi bi-hospital-fill"></i>
+          </div>
+          <div class="stats-content">
+            <div class="stats-number">{{ ipressCount }}</div>
+            <div class="stats-label">IPRESS Registradas</div>
+            <div class="stats-trend">
+              <i class="bi bi-arrow-up"></i>
+              <span>+5% este mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-footer">
+          <a [routerLink]="['/admin/ipress']" class="stats-link">
+            Ver detalles <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="stats-card stats-card-warning">
+        <div class="stats-card-body">
+          <div class="stats-icon">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <div class="stats-content">
+            <div class="stats-number">{{ pacientesCount }}</div>
+            <div class="stats-label">Pacientes Registrados</div>
+            <div class="stats-trend">
+              <i class="bi bi-arrow-up"></i>
+              <span>+15% este mes</span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-footer">
+          <a [routerLink]="['/admin/pacientes']" class="stats-link">
+            Ver detalles <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="!loading && !error">
+    <div class="col-lg-8">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Citas Recientes</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Paciente</th>
+                  <th scope="col">Médico</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cita of citasRecientes">
+                  <td>{{ cita.id }}</td>
+                  <td>{{ cita.paciente }}</td>
+                  <td>{{ cita.medico }}</td>
+                  <td>{{ cita.fecha }}</td>
+                  <td>
+                    <span class="badge rounded-pill" [ngClass]="{
+                      'bg-success': cita.estado === 'Completada',
+                      'bg-danger': cita.estado === 'Cancelada',
+                      'bg-warning': cita.estado === 'Pendiente'
+                    }">
+                      {{ cita.estado }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <a [routerLink]="['/admin/citas']" class="btn btn-sm btn-outline-primary">Ver todas las citas</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Distribución de Usuarios</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Tipo</th>
+                  <th scope="col" class="text-end">Cantidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of usuariosPorTipo">
+                  <td>{{ item.tipo }}</td>
+                  <td class="text-end">{{ item.cantidad }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="fw-bold">
+                  <td>Total</td>
+                  <td class="text-end">{{ usuariosCount }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <a [routerLink]="['/admin/usuarios']" class="btn btn-sm btn-outline-primary">Ver todos los usuarios</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="!loading && !error">
+    <div class="col-12">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Accesos Rápidos</h6>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+              <div class="quick-access-card quick-access-primary">
+                <div class="quick-access-icon">
+                  <i class="bi bi-building"></i>
+                </div>
+                <div class="quick-access-content">
+                  <h5 class="quick-access-title">IPRESS</h5>
+                  <p class="quick-access-description">Gestiona centros de salud y establecimientos médicos</p>
+                  <div class="quick-access-stats">
+                    <span class="badge bg-primary">{{ ipressCount }} registradas</span>
+                  </div>
+                </div>
+                <div class="quick-access-actions">
+                  <a [routerLink]="['/admin/ipress']" class="btn btn-primary btn-sm">
+                    <i class="bi bi-arrow-right me-1"></i>Gestionar
+                  </a>
+                  <a [routerLink]="['/admin/ipress/create']" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-plus me-1"></i>Nuevo
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+              <div class="quick-access-card quick-access-success">
+                <div class="quick-access-icon">
+                  <i class="bi bi-people"></i>
+                </div>
+                <div class="quick-access-content">
+                  <h5 class="quick-access-title">Usuarios</h5>
+                  <p class="quick-access-description">Administra usuarios del sistema y permisos</p>
+                  <div class="quick-access-stats">
+                    <span class="badge bg-success">{{ usuariosCount }} usuarios</span>
+                  </div>
+                </div>
+                <div class="quick-access-actions">
+                  <a [routerLink]="['/admin/usuarios']" class="btn btn-success btn-sm">
+                    <i class="bi bi-arrow-right me-1"></i>Gestionar
+                  </a>
+                  <a [routerLink]="['/admin/usuarios/create']" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-plus me-1"></i>Nuevo
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+               <div class="quick-access-card quick-access-info">
+                 <div class="quick-access-icon">
+                   <i class="bi bi-clipboard2-pulse"></i>
+                 </div>
+                 <div class="quick-access-content">
+                   <h5 class="quick-access-title">Médicos</h5>
+                   <p class="quick-access-description">Gestiona médicos y especialidades médicas</p>
+                   <div class="quick-access-stats">
+                     <span class="badge bg-info">{{ medicosCount }} médicos</span>
+                   </div>
+                 </div>
+                 <div class="quick-access-actions">
+                   <a [routerLink]="['/admin/medicos']" class="btn btn-info btn-sm">
+                     <i class="bi bi-arrow-right me-1"></i>Gestionar
+                   </a>
+                   <a [routerLink]="['/admin/medicos/create']" class="btn btn-outline-info btn-sm">
+                     <i class="bi bi-plus me-1"></i>Nuevo
+                   </a>
+                 </div>
+               </div>
+             </div>
+             
+             <div class="col-lg-3 col-md-6">
+               <div class="quick-access-card quick-access-warning">
+                 <div class="quick-access-icon">
+                   <i class="bi bi-calendar-check"></i>
+                 </div>
+                 <div class="quick-access-content">
+                   <h5 class="quick-access-title">Citas Médicas</h5>
+                   <p class="quick-access-description">Administra citas y programación médica</p>
+                   <div class="quick-access-stats">
+                     <span class="badge bg-warning">Próximamente</span>
+                   </div>
+                 </div>
+                 <div class="quick-access-actions">
+                   <a [routerLink]="['/admin/citas']" class="btn btn-warning btn-sm">
+                     <i class="bi bi-arrow-right me-1"></i>Gestionar
+                   </a>
+                   <a [routerLink]="['/admin/citas/create']" class="btn btn-outline-warning btn-sm">
+                     <i class="bi bi-plus me-1"></i>Nueva
+                   </a>
+                 </div>
+               </div>
+             </div>
+          </div>
+        </div>
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Actividad Reciente</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Acción</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Dr. Juan Pérez</td>
+                  <td>Actualización de perfil</td>
+                  <td>10/05/2023</td>
+                  <td><span class="badge bg-success">Completado</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Hospital San José</td>
+                  <td>Registro de nueva IPRESS</td>
+                  <td>09/05/2023</td>
+                  <td><span class="badge bg-warning">Pendiente</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>María Rodríguez</td>
+                  <td>Registro de paciente</td>
+                  <td>08/05/2023</td>
+                  <td><span class="badge bg-success">Completado</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Dr. Carlos Gómez</td>
+                  <td>Actualización de horario</td>
+                  <td>07/05/2023</td>
+                  <td><span class="badge bg-success">Completado</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Clínica Santa María</td>
+                  <td>Actualización de servicios</td>
+                  <td>06/05/2023</td>
+                  <td><span class="badge bg-danger">Error</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

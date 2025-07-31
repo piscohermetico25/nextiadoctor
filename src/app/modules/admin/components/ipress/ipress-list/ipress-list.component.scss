@@ -1,0 +1,429 @@
+// Modern IPRESS List Styles
+.ipress-container {
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+// Filters Section
+.filters-section {
+  margin-bottom: 2rem;
+
+  .filters-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+  }
+
+  .search-input-group {
+    position: relative;
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      z-index: 3;
+    }
+
+    .search-input {
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+      }
+
+      &::placeholder {
+        color: #adb5bd;
+      }
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6c757d;
+      padding: 0.25rem;
+      border-radius: 50%;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f8f9fa;
+        color: #495057;
+      }
+    }
+  }
+
+  .results-info {
+    text-align: center;
+    padding: 1rem 0;
+
+    .results-count {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #28a745;
+    }
+
+    .results-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+  }
+}
+
+// Content Section
+.content-section {
+  // Loading State
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    .loading-content {
+      text-align: center;
+      padding: 2rem;
+
+      .spinner-border {
+        width: 3rem;
+        height: 3rem;
+      }
+
+      h5 {
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  // Error State
+  .error-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    .error-content {
+      text-align: center;
+      padding: 2rem;
+
+      i {
+        font-size: 3rem;
+      }
+
+      h5 {
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+
+      .btn {
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    .empty-content {
+      text-align: center;
+      padding: 2rem;
+
+      i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      h5 {
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+
+      .btn {
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// IPRESS Table
+.ipress-table-container {
+  .table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+  }
+
+  .table-modern {
+    margin: 0;
+    
+    thead {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      
+      th {
+        border: none;
+        padding: 1.25rem 1rem;
+        font-weight: 700;
+        color: #495057;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
+        &.th-ipress { width: 25%; }
+        &.th-ruc { width: 15%; }
+        &.th-contact { width: 20%; }
+        &.th-location { width: 20%; }
+        &.th-status { width: 10%; }
+        &.th-actions { width: 10%; text-align: center; }
+      }
+    }
+    
+    tbody {
+      .ipress-row {
+        border: none;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: #f8f9fa;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        td {
+          border: none;
+          padding: 1.25rem 1rem;
+          vertical-align: middle;
+          border-bottom: 1px solid #f1f3f4;
+        }
+      }
+    }
+  }
+}
+
+// IPRESS Info
+.ipress-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .ipress-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  }
+
+  .ipress-details {
+    .ipress-name {
+      font-weight: 600;
+      color: #495057;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .ipress-id {
+      color: #6c757d;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// RUC Info
+.ruc-info {
+  .ruc-number {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.95rem;
+  }
+}
+
+// Contact Info
+.contact-info {
+  .contact-phone,
+  .contact-email {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    
+    i {
+      color: #28a745;
+      width: 14px;
+    }
+  }
+}
+
+// Location Info
+.location-info {
+  .location-address {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+}
+
+// Status Badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  
+  &.status-active {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+  }
+  
+  &.status-inactive {
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+    color: white;
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  
+  .btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    
+    &.btn-view {
+      background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+      color: white;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+      }
+    }
+    
+    &.btn-edit {
+      background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+      color: white;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+      }
+    }
+    
+    &.btn-delete {
+      background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+      color: white;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .ipress-container {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+    
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .page-title {
+      font-size: 1.5rem;
+      
+      i {
+        font-size: 2rem;
+      }
+    }
+  }
+  
+  .filters-section {
+    .filters-card {
+      padding: 1rem;
+    }
+    
+    .row {
+      .col-md-6 {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+  
+  .table-responsive {
+    .ipress-info {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+      
+      .ipress-avatar {
+        width: 40px;
+        height: 40px;
+      }
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+}

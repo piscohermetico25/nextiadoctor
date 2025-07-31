@@ -1,0 +1,65 @@
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-container">
+          <i class="bi bi-heart-pulse-fill logo-icon"></i>
+          <div class="logo-pulse"></div>
+        </div>
+      </div>
+      <h4 class="brand-title">{{ systemName }}</h4>
+      <p class="brand-subtitle">Luis Javier Casiano Ramos</p>
+      <p class="brand-subtitle">Administrador</p>
+      <div class="brand-badge">
+        <i class="bi bi-shield-check-fill"></i>
+        <span>admin&#64;nextiadoctor.com</span>
+      </div>
+      
+    </div>
+
+
+    
+    <div class="sidebar-menu">
+      <div class="menu-section">
+        <h6 class="menu-title">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+          Módulos Principales
+        </h6>
+        <ul class="nav flex-column">
+          <li class="nav-item" *ngFor="let item of menuItems">
+            <a 
+              class="nav-link" 
+              [routerLink]="[item.route]" 
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: item.route === '/admin'}"
+            >
+              <div class="nav-link-content">
+                <div class="nav-icon-wrapper">
+                  <i class="bi {{ item.icon }}"></i>
+                </div>
+                <div class="nav-text">
+                  <span class="nav-label">{{ item.label }}</span>
+                  <small class="nav-badge badge bg-{{ item.badgeColor }}">{{ item.badge }}</small>
+                </div>
+              </div>
+              <i class="bi bi-chevron-right nav-arrow"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+
+    
+    <!-- Content -->
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

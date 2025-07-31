@@ -1,0 +1,196 @@
+<app-page-header
+  title="Gestión de Médicos"
+  subtitle="Administra el personal médico y sus especialidades"
+  icon="bi bi-heart-pulse-fill"
+  actionType="button"
+  actionText="Nuevo Médico"
+  actionRoute="/admin/medicos/create"
+  actionIcon="bi bi-plus-circle"
+  primaryColor="#17a2b8"
+  secondaryColor="#138496"
+  [showAction]="true">
+</app-page-header>
+
+<div class="medicos-container">
+  <!-- Header Section -->
+
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <div class="row align-items-center g-3">
+        <div class="col-md-4">
+          <div class="filter-group">
+            <label class="filter-label">Filtrar por especialidad</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="especialidadFilter"
+              (change)="filterMedicos()"
+            >
+              <option value="">🔍 Todas las especialidades</option>
+              <option value="CARDIOLOGIA">❤️ Cardiología</option>
+              <option value="NEUROLOGIA">🧠 Neurología</option>
+              <option value="PEDIATRIA">👶 Pediatría</option>
+              <option value="GINECOLOGIA">👩‍⚕️ Ginecología</option>
+              <option value="TRAUMATOLOGIA">🦴 Traumatología</option>
+              <option value="MEDICINA_GENERAL">🩺 Medicina General</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="filter-group">
+            <label class="filter-label">Buscar médicos</label>
+            <div class="search-input-group">
+              <i class="bi bi-search search-icon"></i>
+              <input 
+                type="text" 
+                class="form-control search-input" 
+                placeholder="Buscar por nombre, colegiatura, email o teléfono..." 
+                [(ngModel)]="searchTerm"
+                (input)="filterMedicos()"
+              >
+              <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="results-info">
+            <span class="results-count">{{ filteredMedicos.length }}</span>
+            <span class="results-label">médicos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-content">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <h5>Cargando médicos...</h5>
+        <p class="text-muted">Por favor espera mientras obtenemos la información</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-state">
+      <div class="error-content">
+        <i class="bi bi-exclamation-triangle-fill text-danger mb-3"></i>
+        <h5>Error al cargar médicos</h5>
+        <p class="text-muted mb-3">{{ error }}</p>
+        <button class="btn btn-outline-primary" (click)="loadMedicos()">
+          <i class="bi bi-arrow-clockwise me-2"></i>
+          Reintentar
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && filteredMedicos.length === 0" class="empty-state">
+      <div class="empty-content">
+        <i class="bi bi-heart-pulse text-muted mb-3"></i>
+        <h5>No se encontraron médicos</h5>
+        <p class="text-muted mb-3">No hay médicos que coincidan con los criterios de búsqueda.</p>
+        <button class="btn btn-primary" [routerLink]="['/admin/medicos/create']">
+          <i class="bi bi-plus-circle me-2"></i>
+          Registrar primer médico
+        </button>
+      </div>
+    </div>
+
+    <!-- Medicos Table -->
+    <div *ngIf="!loading && !error && filteredMedicos.length > 0" class="medicos-table-container">
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table table-modern">
+            <thead>
+              <tr>
+                <th class="th-medico">Médico</th>
+                <th class="th-specialty">Especialidad</th>
+                <th class="th-colegiatura">Colegiatura</th>
+                <th class="th-contact">Contacto</th>
+                <th class="th-status">Estado</th>
+                <th class="th-actions">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+               <tr *ngFor="let medico of filteredMedicos" class="medico-row">
+                 <td class="td-medico">
+                   <div class="medico-info">
+                     <div class="medico-avatar">
+                       {{ getInitials(medico.nombre) }}
+                     </div>
+                     <div class="medico-details">
+                       <div class="medico-name">{{ medico.nombre }}</div>
+                       <div class="medico-usuario">{{ getUsuarioEmail(medico.usuario_id) }}</div>
+                     </div>
+                   </div>
+                 </td>
+                 <td class="td-specialty">
+                   <span class="specialty-badge" [ngClass]="getEspecialidadBadgeClass(undefined)">
+                     <i class="badge-icon" [ngClass]="getEspecialidadIcon(undefined)"></i>
+                     {{ getEspecialidadLabel(undefined) }}
+                   </span>
+                 </td>
+                 <td class="td-colegiatura">
+                   <div class="colegiatura-info">
+                     <div class="colegiatura-number">{{ medico.nro_colegiatura || 'N/A' }}</div>
+                     <div class="colegiatura-label">Nº Colegiatura</div>
+                   </div>
+                 </td>
+                 <td class="td-contact">
+                   <div class="contact-info">
+                     <div *ngIf="medico.telefono" class="contact-phone">
+                       <i class="bi bi-telephone me-1"></i>{{ medico.telefono }}
+                     </div>
+                     <div *ngIf="medico.email" class="contact-email">
+                       <i class="bi bi-envelope me-1"></i>{{ medico.email }}
+                     </div>
+                   </div>
+                 </td>
+                 <td class="td-status">
+                   <span class="status-badge" [ngClass]="getEstadoBadgeClass(medico.estado_id === 1)">
+                     <i class="bi" [ngClass]="medico.estado_id === 1 ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                     {{ medico.estado_id === 1 ? 'Activo' : medico.estado_id === 2 ? 'Inactivo' : 'Sin estado' }}
+                   </span>
+                 </td>
+                 <td class="td-actions">
+                   <div class="action-buttons">
+                     <button 
+                       class="btn btn-action btn-view" 
+                       [routerLink]="['/admin/medicos/detail', medico.id]"
+                       title="Ver detalles"
+                     >
+                       <i class="bi bi-eye"></i>
+                     </button>
+                     <button 
+                       class="btn btn-action btn-edit" 
+                       [routerLink]="['/admin/medicos/edit', medico.id]"
+                       title="Editar"
+                     >
+                       <i class="bi bi-pencil"></i>
+                     </button>
+                     <button 
+                       class="btn btn-action btn-delete" 
+                       (click)="deleteMedico(medico.id)"
+                       title="Eliminar"
+                     >
+                       <i class="bi bi-trash"></i>
+                     </button>
+                   </div>
+                 </td>
+               </tr>
+             </tbody>
+           </table>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>

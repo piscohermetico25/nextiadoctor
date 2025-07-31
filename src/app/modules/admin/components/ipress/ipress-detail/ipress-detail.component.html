@@ -1,0 +1,181 @@
+<app-page-header
+  title="Detalle de IPRESS"
+  subtitle="Información completa del establecimiento de salud"
+  icon="bi bi-building-fill"
+  actionType="button"
+  actionText="Editar IPRESS"
+  [actionRoute]="ipress ? '/admin/ipress/edit/' + ipress.id : ''"
+  actionIcon="bi bi-pencil"
+  primaryColor="#28a745"
+  secondaryColor="#1e7e34"
+  [showAction]="!!ipress"
+  [showBackButton]="true"
+  backRoute="/admin/ipress">
+</app-page-header>
+
+<div class="ipress-detail-container">
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-content">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <h5>Cargando información de IPRESS...</h5>
+      <p class="text-muted">Por favor espera mientras obtenemos los datos</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <div class="error-content">
+      <i class="bi bi-exclamation-triangle-fill text-danger mb-3"></i>
+      <h5>Error al cargar información</h5>
+      <p class="text-muted mb-3">{{ error }}</p>
+      <button class="btn btn-outline-primary" (click)="ngOnInit()">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error && ipress" class="content-section">
+    <div class="row g-4">
+      <div class="col-md-8">
+        <!-- Información Principal -->
+        <div class="detail-card">
+          <div class="card-header">
+            <div class="header-content">
+              <div class="ipress-avatar-large">
+                {{ getInitials(ipress.nombre) }}
+              </div>
+              <div class="header-info">
+                <h3 class="ipress-name">{{ ipress.nombre }}</h3>
+                <div class="ipress-meta">
+                  <span class="type-badge">
+                    <i class="bi bi-building me-1"></i>
+                    Establecimiento de Salud
+                  </span>
+                  <span class="status-badge" [ngClass]="{
+                    'status-active': ipress.estado_id === 1,
+                    'status-inactive': ipress.estado_id === 2,
+                    'status-unknown': !ipress.estado_id
+                  }">
+                    <i class="bi" [ngClass]="{
+                      'bi-check-circle-fill': ipress.estado_id === 1,
+                      'bi-x-circle-fill': ipress.estado_id === 2,
+                      'bi-question-circle-fill': !ipress.estado_id
+                    }"></i>
+                    {{ estado?.nombre || 'Sin estado' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-card-text me-2"></i>
+                  RUC
+                </div>
+                <div class="info-value">{{ ipress.ruc || 'No registrado' }}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-geo-alt me-2"></i>
+                  Dirección
+                </div>
+                <div class="info-value">{{ ipress.direccion || 'No registrada' }}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-telephone me-2"></i>
+                  Teléfono
+                </div>
+                <div class="info-value">
+                  <a *ngIf="ipress.telefono" href="tel:{{ ipress.telefono }}" class="contact-link">
+                    {{ ipress.telefono }}
+                  </a>
+                  <span *ngIf="!ipress.telefono" class="text-muted">No registrado</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-envelope me-2"></i>
+                  Email
+                </div>
+                <div class="info-value">
+                  <a *ngIf="ipress.email" href="mailto:{{ ipress.email }}" class="contact-link">
+                    {{ ipress.email }}
+                  </a>
+                  <span *ngIf="!ipress.email" class="text-muted">No registrado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- Acciones Rápidas -->
+        <div class="actions-card">
+          <div class="card-header">
+            <h5 class="card-title">
+              <i class="bi bi-lightning me-2"></i>
+              Acciones Rápidas
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="action-buttons">
+              <button class="action-btn action-primary" [routerLink]="['/admin/ipress/edit', ipress.id]">
+                <div class="action-icon">
+                  <i class="bi bi-pencil"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Editar IPRESS</div>
+                  <div class="action-description">Modificar información</div>
+                </div>
+              </button>
+              
+              <button class="action-btn action-info" [routerLink]="['/admin/usuarios/ipress', ipress.id]">
+                <div class="action-icon">
+                  <i class="bi bi-people"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Ver Usuarios</div>
+                  <div class="action-description">Usuarios asociados</div>
+                </div>
+              </button>
+              
+              <button class="action-btn action-secondary" disabled>
+                <div class="action-icon">
+                  <i class="bi bi-building"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Ver Sedes</div>
+                  <div class="action-description">Próximamente</div>
+                </div>
+              </button>
+              
+              <button class="action-btn action-secondary" disabled>
+                <div class="action-icon">
+                  <i class="bi bi-clipboard2-pulse"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Ver Médicos</div>
+                  <div class="action-description">Próximamente</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

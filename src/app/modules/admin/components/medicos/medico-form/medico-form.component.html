@@ -1,0 +1,273 @@
+<app-page-header
+    [title]="isEditMode ? 'Editar Médico' : 'Nuevo Médico'"
+    [subtitle]="isEditMode ? 'Actualizar información del médico' : 'Registrar nuevo médico en el sistema'"
+    icon="bi-person-badge"
+    actionType="back"
+    actionRoute="/admin/medicos"
+    actionText="Volver a Médicos"
+    actionIcon="bi bi-arrow-left"
+    primaryColor="#17a2b8"
+    secondaryColor="#138496"
+    [showAction]="true">
+  </app-page-header>
+<div class="container-fluid">
+  <!-- Page Header -->
+
+
+  <div class="container">
+
+    <!-- Form Card -->
+    <div class="form-card">
+    
+    <div class="card-body">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando información del médico...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="error-container">
+          <div class="error-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h3 class="error-title">Error al cargar</h3>
+          <p class="error-message">{{ error }}</p>
+        </div>
+
+        <form [formGroup]="medicoForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+          <!-- Información Personal -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-person me-2"></i>
+                Información Personal
+              </h4>
+              <p class="section-description">Datos básicos del médico</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Nombre -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="nombre" class="form-label">
+                    <i class="bi bi-person-fill me-2"></i>
+                    Nombre Completo
+                    <span class="required">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control form-control-modern" 
+                    id="nombre" 
+                    formControlName="nombre"
+                    placeholder="Ingrese el nombre completo"
+                    [ngClass]="{'is-invalid': medicoForm.get('nombre')?.invalid && medicoForm.get('nombre')?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('nombre')?.errors?.['required']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El nombre es requerido
+                  </div>
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('nombre')?.errors?.['maxlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El nombre no debe exceder los 100 caracteres
+                  </div>
+                </div>
+              </div>
+
+              <!-- Número de Colegiatura -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="nro_colegiatura" class="form-label">
+                    <i class="bi bi-card-text me-2"></i>
+                    Número de Colegiatura
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control form-control-modern" 
+                    id="nro_colegiatura" 
+                    formControlName="nro_colegiatura"
+                    placeholder="Ej: CMP-12345"
+                    [ngClass]="{'is-invalid': medicoForm.get('nro_colegiatura')?.invalid && medicoForm.get('nro_colegiatura')?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('nro_colegiatura')?.errors?.['maxlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El número de colegiatura no debe exceder los 20 caracteres
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Profesional -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-briefcase me-2"></i>
+                Información Profesional
+              </h4>
+              <p class="section-description">Especialidad y datos profesionales</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Especialidad -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="especialidad" class="form-label">
+                    <i class="bi bi-award me-2"></i>
+                    Especialidad
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control form-control-modern" 
+                    id="especialidad" 
+                    formControlName="especialidad"
+                    placeholder="Ej: Cardiología, Pediatría"
+                    [ngClass]="{'is-invalid': medicoForm.get('especialidad')?.invalid && medicoForm.get('especialidad')?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('especialidad')?.errors?.['maxlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    La especialidad no debe exceder los 100 caracteres
+                  </div>
+                </div>
+              </div>
+
+              <!-- Teléfono -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="telefono" class="form-label">
+                    <i class="bi bi-telephone me-2"></i>
+                    Teléfono
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control form-control-modern" 
+                    id="telefono" 
+                    formControlName="telefono"
+                    placeholder="Ej: +51 999 123 456"
+                    [ngClass]="{'is-invalid': medicoForm.get('telefono')?.invalid && medicoForm.get('telefono')?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('telefono')?.errors?.['maxlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El teléfono no debe exceder los 20 caracteres
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Contacto -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-envelope me-2"></i>
+                Información de Contacto
+              </h4>
+              <p class="section-description">Datos de contacto del médico</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Email -->
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="email" class="form-label">
+                    <i class="bi bi-envelope-at me-2"></i>
+                    Email
+                  </label>
+                  <input 
+                    type="email" 
+                    class="form-control form-control-modern" 
+                    id="email" 
+                    formControlName="email"
+                    placeholder="ejemplo@correo.com"
+                    [ngClass]="{'is-invalid': medicoForm.get('email')?.invalid && medicoForm.get('email')?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('email')?.errors?.['email']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    Ingrese un email válido
+                  </div>
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('email')?.errors?.['maxlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El email no debe exceder los 100 caracteres
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuración del Sistema -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-gear me-2"></i>
+                Configuración del Sistema
+              </h4>
+              <p class="section-description">Usuario asociado y estado del médico</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Usuario Asociado -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="usuario_id" class="form-label">
+                    <i class="bi bi-person-check me-2"></i>
+                    Usuario Asociado
+                  </label>
+                  <select 
+                    class="form-select form-control-modern" 
+                    id="usuario_id" 
+                    formControlName="usuario_id"
+                  >
+                    <option [ngValue]="null">-- Seleccionar usuario --</option>
+                    <option *ngFor="let usuario of usuarios" [value]="usuario.id">{{ usuario.email }}</option>
+                  </select>
+                  <div class="form-text" *ngIf="loadingUsuarios">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Cargando usuarios...
+                  </div>
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="estado_id" class="form-label">
+                    <i class="bi bi-toggle-on me-2"></i>
+                    Estado
+                    <span class="required">*</span>
+                  </label>
+                  <select 
+                    class="form-select form-control-modern" 
+                    id="estado_id" 
+                    formControlName="estado_id"
+                    [ngClass]="{'is-invalid': medicoForm.get('estado_id')?.invalid && medicoForm.get('estado_id')?.touched}"
+                  >
+                    <option *ngFor="let estado of estados" [value]="estado.id">{{ estado.nombre }}</option>
+                  </select>
+                  <div class="form-text" *ngIf="loadingEstados">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Cargando estados...
+                  </div>
+                  <div class="invalid-feedback" *ngIf="medicoForm.get('estado_id')?.errors?.['required']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El estado es requerido
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline-secondary btn-modern" (click)="onCancel()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-modern" [disabled]="medicoForm.invalid || submitting">
+              <i class="bi bi-{{ isEditMode ? 'check-circle' : 'plus-circle' }} me-2"></i>
+              {{ isEditMode ? 'Actualizar Médico' : 'Crear Médico' }}
+            </button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>

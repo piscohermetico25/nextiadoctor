@@ -1,0 +1,206 @@
+<app-page-header [title]="isEditMode ? 'Editar IPRESS' : 'Nueva IPRESS'"
+  [subtitle]="isEditMode ? 'Actualiza la información de la institución de salud' : 'Registra una nueva institución prestadora de servicios de salud'"
+  icon="bi bi-building" actionType="back" actionRoute="/admin/ipress" actionText="Volver a IPRESS"
+  actionIcon="bi bi-arrow-left" primaryColor="#28a745" secondaryColor="#20c997" [showAction]="true">
+</app-page-header>
+
+<div class="ipress-form-container">
+  <div class="container">
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <div class="card-body">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-state">
+          <div class="loading-content">
+            <div class="spinner-border text-success mb-3" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <h5>Cargando información...</h5>
+            <p class="text-muted">Obteniendo los datos de la IPRESS</p>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="error-state">
+          <div class="error-content">
+            <i class="bi bi-exclamation-triangle-fill text-danger mb-3"></i>
+            <h5>Error al cargar</h5>
+            <p class="error-message">{{ error }}</p>
+          </div>
+        </div>
+
+        <!-- Form Content -->
+        <form [formGroup]="ipressForm" (ngSubmit)="onSubmit()" *ngIf="!loading" class="modern-form">
+          <div class="form-sections">
+            <!-- Información Básica -->
+            <div class="form-section">
+              <div class="section-header">
+                <h4 class="section-title">
+                  <i class="bi bi-info-circle me-2"></i>
+                  Información Básica
+                </h4>
+                <p class="section-description">Datos principales de la institución</p>
+              </div>
+
+              <div class="row g-4">
+                <!-- Nombre -->
+                <div class="col-md-8">
+                  <div class="form-group">
+                    <label for="nombre" class="form-label">
+                      <i class="bi bi-building me-2"></i>
+                      Nombre de la IPRESS
+                      <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-control form-control-modern" id="nombre" formControlName="nombre"
+                      placeholder="Ingrese el nombre completo de la institución"
+                      [ngClass]="{'is-invalid': nombreControl?.invalid && nombreControl?.touched}">
+                    <div class="invalid-feedback" *ngIf="nombreControl?.errors?.['required']">
+                      <i class="bi bi-exclamation-circle me-1"></i>
+                      El nombre es obligatorio
+                    </div>
+                    <div class="invalid-feedback" *ngIf="nombreControl?.errors?.['maxlength']">
+                      <i class="bi bi-exclamation-circle me-1"></i>
+                      El nombre no puede exceder los 200 caracteres
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RUC -->
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="ruc" class="form-label">
+                      <i class="bi bi-card-text me-2"></i>
+                      RUC
+                    </label>
+                    <input type="text" class="form-control form-control-modern" id="ruc" formControlName="ruc"
+                      placeholder="12345678901" maxlength="11"
+                      [ngClass]="{'is-invalid': rucControl?.invalid && rucControl?.touched}">
+                    <div class="invalid-feedback" *ngIf="rucControl?.errors?.['pattern']">
+                      <i class="bi bi-exclamation-circle me-1"></i>
+                      El RUC debe tener 11 dígitos numéricos
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información de Ubicación -->
+            <div class="form-section">
+              <div class="section-header">
+                <h4 class="section-title">
+                  <i class="bi bi-geo-alt me-2"></i>
+                  Ubicación
+                </h4>
+                <p class="section-description">Dirección y datos de ubicación</p>
+              </div>
+
+              <div class="row g-4">
+                <!-- Dirección -->
+                <div class="col-12">
+                  <div class="form-group">
+                    <label for="direccion" class="form-label">
+                      <i class="bi bi-house me-2"></i>
+                      Dirección
+                    </label>
+                    <input type="text" class="form-control form-control-modern" id="direccion"
+                      formControlName="direccion" placeholder="Ingrese la dirección completa de la institución">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="form-section">
+              <div class="section-header">
+                <h4 class="section-title">
+                  <i class="bi bi-telephone me-2"></i>
+                  Contacto
+                </h4>
+                <p class="section-description">Medios de comunicación</p>
+              </div>
+
+              <div class="row g-4">
+                <!-- Teléfono -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="telefono" class="form-label">
+                      <i class="bi bi-phone me-2"></i>
+                      Teléfono
+                    </label>
+                    <input type="text" class="form-control form-control-modern" id="telefono" formControlName="telefono"
+                      placeholder="987654321" maxlength="9"
+                      [ngClass]="{'is-invalid': telefonoControl?.invalid && telefonoControl?.touched}">
+                    <div class="invalid-feedback" *ngIf="telefonoControl?.errors?.['pattern']">
+                      <i class="bi bi-exclamation-circle me-1"></i>
+                      El teléfono debe tener 9 dígitos numéricos
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="email" class="form-label">
+                      <i class="bi bi-envelope me-2"></i>
+                      Email
+                    </label>
+                    <input type="email" class="form-control form-control-modern" id="email" formControlName="email"
+                      placeholder="contacto@ipress.com"
+                      [ngClass]="{'is-invalid': emailControl?.invalid && emailControl?.touched}">
+                    <div class="invalid-feedback" *ngIf="emailControl?.errors?.['email']">
+                      <i class="bi bi-exclamation-circle me-1"></i>
+                      Ingrese un email válido
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Configuración -->
+            <div class="form-section">
+              <div class="section-header">
+                <h4 class="section-title">
+                  <i class="bi bi-gear me-2"></i>
+                  Configuración
+                </h4>
+                <p class="section-description">Estado y configuraciones adicionales</p>
+              </div>
+
+              <div class="row g-4">
+                <!-- Estado -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="estado" class="form-label">
+                      <i class="bi bi-toggle-on me-2"></i>
+                      Estado
+                      <span class="required">*</span>
+                    </label>
+                    <select class="form-select form-control-modern" id="estado" formControlName="estado_id">
+                      <option *ngFor="let estado of estados" [value]="estado.id">{{ estado.nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="form-actions">
+            <div class="actions-container">
+              <button type="button" class="btn btn-outline-secondary btn-modern" (click)="onCancel()">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-modern" [disabled]="ipressForm.invalid || submitting">
+                <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!submitting" class="bi {{ isEditMode ? 'bi-check-circle' : 'bi-plus-circle' }} me-2"></i>
+                {{ isEditMode ? 'Actualizar IPRESS' : 'Registrar IPRESS' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

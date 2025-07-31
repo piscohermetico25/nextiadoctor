@@ -1,0 +1,194 @@
+<div class="container-fluid mt-4">
+  <h1 class="h3 mb-2 text-gray-800">Dashboard Médico</h1>
+  <p class="mb-4">Resumen de estadísticas y actividades del médico.</p>
+
+  <!-- Content Row -->
+  <div class="row">
+
+    <!-- Pacientes Atendidos Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pacientes Atendidos (Hoy)</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-calendar fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Citas Pendientes Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Citas Pendientes</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horas Trabajadas Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Horas Trabajadas (Semana)</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">32</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-clock fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensajes Pendientes Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Mensajes Pendientes</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-comments fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Row -->
+  <div class="row">
+
+    <!-- Area Chart -->
+    <div class="col-xl-8 col-lg-7">
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Pacientes Atendidos por Mes</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="chart-area">
+            <p class="text-center">Gráfico de pacientes atendidos por mes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-xl-4 col-lg-5">
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Distribución por Diagnóstico</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="chart-pie">
+            <p class="text-center">Gráfico de distribución por diagnóstico</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Row -->
+  <div class="row">
+
+    <!-- Content Column -->
+    <div class="col-lg-12 mb-4">
+
+      <!-- Project Card Example -->
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Próximas Citas</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Hora</th>
+                  <th>Fecha</th>
+                  <th>Motivo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Juan Pérez</td>
+                  <td>09:00 AM</td>
+                  <td>15/04/2023</td>
+                  <td>Control mensual</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">Ver</button>
+                    <button class="btn btn-sm btn-warning">Reprogramar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>María López</td>
+                  <td>10:30 AM</td>
+                  <td>15/04/2023</td>
+                  <td>Consulta general</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">Ver</button>
+                    <button class="btn btn-sm btn-warning">Reprogramar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pedro Ramírez</td>
+                  <td>12:00 PM</td>
+                  <td>15/04/2023</td>
+                  <td>Revisión de exámenes</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">Ver</button>
+                    <button class="btn btn-sm btn-warning">Reprogramar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Carmen Díaz</td>
+                  <td>03:00 PM</td>
+                  <td>15/04/2023</td>
+                  <td>Primera consulta</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">Ver</button>
+                    <button class="btn btn-sm btn-warning">Reprogramar</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Roberto Sánchez</td>
+                  <td>04:30 PM</td>
+                  <td>15/04/2023</td>
+                  <td>Seguimiento</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">Ver</button>
+                    <button class="btn btn-sm btn-warning">Reprogramar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,262 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'"
+  [subtitle]="isEditMode ? 'Actualiza la información del usuario seleccionado' : 'Registra un nuevo usuario en el sistema'"
+  icon="bi-person-plus"
+  actionType="back"
+  actionRoute="/admin/usuarios"
+  actionText="Volver a Usuarios"
+  actionIcon="bi bi-arrow-left"
+  primaryColor="#007bff"
+  secondaryColor="#0056b3"
+  [showAction]="true">
+</app-page-header>
+
+<div class="container-fluid">
+    <div class="container">
+
+    <!-- Form Card -->
+    <div class="form-card">
+
+      <div class="card-body">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando información del usuario...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="error-container">
+          <div class="error-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h4 class="error-title">Error al cargar</h4>
+          <p class="error-message">{{ error }}</p>
+          <button class="btn btn-retry" (click)="ngOnInit()">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Reintentar
+          </button>
+        </div>
+
+        <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+          <!-- Información Personal -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-person me-2"></i>
+                Información Personal
+              </h4>
+              <p class="section-description">Datos básicos del usuario</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Nombre -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="nombre" class="form-label">
+                    <i class="bi bi-person-badge me-2"></i>
+                    Nombre completo
+                    <span class="required">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control form-control-modern" 
+                    id="nombre" 
+                    formControlName="nombre"
+                    placeholder="Ingrese el nombre completo"
+                    [ngClass]="{'is-invalid': nombreControl?.invalid && nombreControl?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="nombreControl?.errors?.['required']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El nombre es obligatorio
+                  </div>
+                  <div class="invalid-feedback" *ngIf="nombreControl?.errors?.['maxlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El nombre no puede exceder los 100 caracteres
+                  </div>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="email" class="form-label">
+                    <i class="bi bi-envelope me-2"></i>
+                    Email
+                    <span class="required">*</span>
+                  </label>
+                  <input 
+                    type="email" 
+                    class="form-control form-control-modern" 
+                    id="email" 
+                    formControlName="email"
+                    placeholder="usuario@ejemplo.com"
+                    [ngClass]="{'is-invalid': emailControl?.invalid && emailControl?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="emailControl?.errors?.['required']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El email es obligatorio
+                  </div>
+                  <div class="invalid-feedback" *ngIf="emailControl?.errors?.['email']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    Ingrese un email válido
+                  </div>
+                </div>
+              </div>
+
+              <!-- Teléfono -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="telefono" class="form-label">
+                    <i class="bi bi-phone me-2"></i>
+                    Teléfono
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control form-control-modern" 
+                    id="telefono" 
+                    formControlName="telefono"
+                    placeholder="987654321"
+                    maxlength="9"
+                    [ngClass]="{'is-invalid': telefonoControl?.invalid && telefonoControl?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="telefonoControl?.errors?.['pattern']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    El teléfono debe tener 9 dígitos numéricos
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuración de Acceso -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-shield-check me-2"></i>
+                Configuración de Acceso
+              </h4>
+              <p class="section-description">Tipo de usuario y permisos</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Tipo de Usuario -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="tipo_usuario" class="form-label">
+                    <i class="bi bi-person-gear me-2"></i>
+                    Tipo de Usuario
+                    <span class="required">*</span>
+                  </label>
+                  <select 
+                    class="form-select form-control-modern" 
+                    id="tipo_usuario" 
+                    formControlName="tipo_usuario"
+                  >
+                    <option value="ADMIN">👑 Administrador</option>
+                    <option value="IPRESS_ADMIN">🏥 Administrador de IPRESS</option>
+                    <option value="MEDICO">👨‍⚕️ Médico</option>
+                    <option value="PACIENTE">👤 Paciente</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- IPRESS (solo para IPRESS_ADMIN) -->
+              <div class="col-md-6" *ngIf="showIpressField">
+                <div class="form-group">
+                  <label for="ipress_id" class="form-label">
+                    <i class="bi bi-building me-2"></i>
+                    IPRESS
+                    <span class="required">*</span>
+                  </label>
+                  <select 
+                    class="form-select form-control-modern" 
+                    id="ipress_id" 
+                    formControlName="ipress_id"
+                    [ngClass]="{'is-invalid': ipressIdControl?.invalid && ipressIdControl?.touched}"
+                  >
+                    <option [ngValue]="null">Seleccione una IPRESS</option>
+                    <option *ngFor="let item of ipress" [value]="item.id">{{ item.nombre }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="ipressIdControl?.errors?.['required']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    Debe seleccionar una IPRESS
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguridad -->
+          <div class="form-section">
+            <div class="section-header">
+              <h4 class="section-title">
+                <i class="bi bi-key me-2"></i>
+                Seguridad
+              </h4>
+              <p class="section-description">Contraseña y configuraciones de seguridad</p>
+            </div>
+            
+            <div class="row g-4">
+              <!-- Contraseña -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="contrasena" class="form-label">
+                    <i class="bi bi-lock me-2"></i>
+                    {{ isEditMode ? 'Nueva Contraseña' : 'Contraseña' }}
+                    <span class="required" *ngIf="!isEditMode">*</span>
+                  </label>
+                  <input 
+                    type="password" 
+                    class="form-control form-control-modern" 
+                    id="contrasena" 
+                    formControlName="contrasena_hash"
+                    [placeholder]="isEditMode ? 'Dejar en blanco para mantener la actual' : 'Mínimo 6 caracteres'"
+                    [ngClass]="{'is-invalid': contrasenaControl?.invalid && contrasenaControl?.touched}"
+                  >
+                  <div class="invalid-feedback" *ngIf="contrasenaControl?.errors?.['required']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    La contraseña es obligatoria
+                  </div>
+                  <div class="invalid-feedback" *ngIf="contrasenaControl?.errors?.['minlength']">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    La contraseña debe tener al menos 6 caracteres
+                  </div>
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="estado" class="form-label">
+                    <i class="bi bi-toggle-on me-2"></i>
+                    Estado
+                    <span class="required">*</span>
+                  </label>
+                  <select 
+                    class="form-select form-control-modern" 
+                    id="estado" 
+                    formControlName="estado_id"
+                  >
+                    <option *ngFor="let estado of estados" [value]="estado.id">{{ estado.nombre }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <!-- Acciones -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline-secondary btn-modern" (click)="onCancel()">
+            <i class="bi bi-arrow-left me-2"></i>
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary btn-modern" [disabled]="usuarioForm.invalid || loading">
+            <i class="bi bi-{{ isEditMode ? 'check-circle' : 'plus-circle' }} me-2"></i>
+            {{ isEditMode ? 'Actualizar Usuario' : 'Crear Usuario' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

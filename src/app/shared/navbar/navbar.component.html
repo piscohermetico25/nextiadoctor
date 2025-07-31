@@ -1,0 +1,112 @@
+<nav class="navbar navbar-expand-lg navbar-professional">
+  <div class="container">
+    <a class="navbar-brand brand-professional" routerLink="/">
+      <i class="bi bi-heart-pulse-fill brand-icon"></i>
+      <span class="brand-text">NextiaDoctor</span>
+      <span class="brand-tagline">Pro</span>
+    </a>
+    
+    <button class="navbar-toggler custom-toggler" type="button" (click)="isMenuCollapsed = !isMenuCollapsed">
+      <span class="toggler-line"></span>
+      <span class="toggler-line"></span>
+      <span class="toggler-line"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [ngClass]="{'show': !isMenuCollapsed}">
+      <ul class="navbar-nav ms-auto nav-professional d-flex align-items-center">
+        <li class="nav-item">
+          <a class="nav-link nav-link-professional" routerLink="/home" routerLinkActive="active">
+            <i class="bi bi-house-fill nav-icon"></i>
+            <span>Inicio</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-professional" routerLink="/about" routerLinkActive="active">
+            <i class="bi bi-info-circle-fill nav-icon"></i>
+            <span>Acerca de</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-professional" routerLink="/contact" routerLinkActive="active">
+            <i class="bi bi-envelope-fill nav-icon"></i>
+            <span>Contacto</span>
+          </a>
+        </li>
+        <!-- Usuario no autenticado -->
+        <li class="nav-item dropdown" *ngIf="!isAuthenticated">
+          <a class="nav-link nav-link-professional dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle nav-icon"></i>
+            <span>Acceso</span>
+          </a>
+          <ul class="dropdown-menu dropdown-professional" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item dropdown-item-professional" routerLink="/admin">
+              <i class="bi bi-shield-fill-check"></i>
+              <span>Administrador</span>
+            </a></li>
+            <li><a class="dropdown-item dropdown-item-professional" routerLink="/ipress">
+              <i class="bi bi-building-fill"></i>
+              <span>IPRESS</span>
+            </a></li>
+            <li><a class="dropdown-item dropdown-item-professional" routerLink="/medico">
+              <i class="bi bi-person-fill-gear"></i>
+              <span>Médico</span>
+            </a></li>
+            <li><a class="dropdown-item dropdown-item-professional" routerLink="/paciente">
+              <i class="bi bi-person-fill"></i>
+              <span>Paciente</span>
+            </a></li>
+          </ul>
+        </li>
+        
+        <!-- Usuario autenticado -->
+        <li class="nav-item dropdown user-dropdown position-relative" *ngIf="isAuthenticated">
+          <a class="nav-link nav-link-professional dropdown-toggle user-profile" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="user-avatar">
+              <span class="avatar-initials">{{ getUserInitials() }}</span>
+            </div>
+            <div class="user-info">
+              <span class="user-name">{{ currentUser?.nombre }}</span>
+              <small class="user-role">{{ getUserTypeLabel() }}</small>
+            </div>
+            <i class="bi bi-chevron-down dropdown-arrow"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-professional user-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li class="dropdown-header">
+              <div class="user-header">
+                <div class="user-avatar-large">
+                  <span class="avatar-initials-large">{{ getUserInitials() }}</span>
+                </div>
+                <div class="user-details">
+                  <h6 class="user-name-header">{{ currentUser?.nombre }}</h6>
+                  <p class="user-email">{{ currentUser?.email }}</p>
+                  <span class="user-badge">
+                    <i class="{{ getUserTypeIcon() }}"></i>
+                    {{ getUserTypeLabel() }}
+                  </span>
+                </div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item dropdown-item-professional" href="#">
+              <i class="bi bi-person-gear"></i>
+              <span>Mi Perfil</span>
+            </a></li>
+            <li><a class="dropdown-item dropdown-item-professional" href="#">
+              <i class="bi bi-gear"></i>
+              <span>Configuración</span>
+            </a></li>
+            <li><a class="dropdown-item dropdown-item-professional" href="#">
+              <i class="bi bi-bell"></i>
+              <span>Notificaciones</span>
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item dropdown-item-professional logout-item" href="#" (click)="logout($event)">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Cerrar Sesión</span>
+            </a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

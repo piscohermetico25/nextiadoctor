@@ -1,0 +1,187 @@
+<app-page-header
+    title="Gestión de Usuarios"
+    subtitle="Administra y supervisa todos los usuarios del sistema NextiaDoctor con control total de accesos y permisos"
+    icon="bi bi-people-gear"
+    actionType="button"
+    actionText="Agregar Usuario"
+    actionRoute="/admin/usuarios/create"
+    actionIcon="bi bi-person-plus-fill"
+    primaryColor="#6366f1"
+    secondaryColor="#4f46e5"
+    [showAction]="true">
+  </app-page-header>
+
+  <div class="usuarios-container">
+  <!-- Header Section -->
+
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <div class="row align-items-center g-3">
+        <div class="col-md-4">
+          <div class="filter-group">
+            <label class="filter-label">Filtrar por tipo</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="tipoFilter"
+              (change)="filterUsuarios()"
+            >
+              <option value="">🔍 Todos los tipos</option>
+              <option value="ADMIN">👑 Administrador</option>
+              <option value="IPRESS_ADMIN">🏥 Admin IPRESS</option>
+              <option value="MEDICO">👨‍⚕️ Médico</option>
+              <option value="PACIENTE">👤 Paciente</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="filter-group">
+            <label class="filter-label">Buscar usuarios</label>
+            <div class="search-input-group">
+              <i class="bi bi-search search-icon"></i>
+              <input 
+                type="text" 
+                class="form-control search-input" 
+                placeholder="Buscar por nombre, email o teléfono..." 
+                [(ngModel)]="searchTerm"
+                (input)="filterUsuarios()"
+              >
+              <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="results-info">
+            <span class="results-count">{{ filteredUsuarios.length }}</span>
+            <span class="results-label">resultados</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-content">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <h5>Cargando médicos...</h5>
+        <p class="text-muted">Por favor espera mientras obtenemos la información</p>
+      </div>
+    </div>
+ 
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-state">
+      <div class="error-content">
+        <i class="bi bi-exclamation-triangle-fill text-danger mb-3"></i>
+        <h5>Error al cargar usuarios</h5>
+        <p class="text-muted mb-3">{{ error }}</p>
+        <button class="btn btn-outline-primary" (click)="loadUsuarios()">
+          <i class="bi bi-arrow-clockwise me-2"></i>
+          Reintentar
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && filteredUsuarios.length === 0" class="empty-state">
+      <div class="empty-content">
+        <i class="bi bi-people text-muted mb-3"></i>
+        <h5>No se encontraron usuarios</h5>
+        <p class="text-muted mb-3">No hay usuarios que coincidan con los criterios de búsqueda.</p>
+        <button class="btn btn-primary" [routerLink]="['/admin/usuarios/create']">
+          <i class="bi bi-plus-circle me-2"></i>
+          Crear primer usuario
+        </button>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div *ngIf="!loading && !error && filteredUsuarios.length > 0" class="users-table-container">
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table table-modern">
+            <thead>
+              <tr>
+                <th class="th-user">Usuario</th>
+                <th class="th-type">Tipo</th>
+                <th class="th-status">Estado</th>
+                <th class="th-date">Fecha Registro</th>
+                <th class="th-actions">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let usuario of filteredUsuarios" class="user-row">
+                <td class="td-user">
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      {{ getInitials(usuario.nombre) }}
+                    </div>
+                    <div class="user-details">
+                      <div class="user-name">{{ usuario.nombre }}</div>
+                      <div class="user-email">{{ usuario.email }}</div>
+                      <div *ngIf="usuario.telefono" class="user-phone">
+                        <i class="bi bi-telephone me-1"></i>{{ usuario.telefono }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="td-type">
+                  <span class="type-badge" [ngClass]="getTipoBadgeClass(usuario.tipo_usuario)">
+                    <i class="badge-icon" [ngClass]="getTipoIcon(usuario.tipo_usuario)"></i>
+                    {{ getTipoLabel(usuario.tipo_usuario) }}
+                  </span>
+                </td>
+                <td class="td-status">
+                  <span class="status-badge" [ngClass]="getEstadoBadgeClass(!usuario.eliminado)">
+                    <i class="bi" [ngClass]="!usuario.eliminado ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    {{ !usuario.eliminado ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="td-date">
+                  <div class="date-info">
+                    <div class="date-primary">{{ usuario.fecha_creacion | date:'dd/MM/yyyy' }}</div>
+                    <div class="date-secondary">{{ usuario.fecha_creacion | date:'HH:mm' }}</div>
+                  </div>
+                </td>
+                <td class="td-actions">
+                  <div class="action-buttons">
+                    <button 
+                      class="btn btn-action btn-view" 
+                      [routerLink]="['/admin/usuarios/detail', usuario.id]"
+                      title="Ver detalles"
+                    >
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button 
+                      class="btn btn-action btn-edit" 
+                      [routerLink]="['/admin/usuarios/edit', usuario.id]"
+                      title="Editar"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button 
+                      class="btn btn-action btn-delete" 
+                      (click)="deleteUsuario(usuario.id)"
+                      title="Eliminar"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+</div>

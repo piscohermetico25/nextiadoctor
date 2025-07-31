@@ -1,0 +1,186 @@
+<app-page-header
+  title="Detalle de Médico"
+  subtitle="Información completa del profesional médico"
+  icon="bi bi-heart-pulse-fill"
+  actionType="button"
+  actionText="Editar Médico"
+  [actionRoute]="medico ? '/admin/medicos/edit/' + medico.id : ''"
+  actionIcon="bi bi-pencil"
+  primaryColor="#17a2b8"
+  secondaryColor="#138496"
+  [showAction]="!!medico"
+  [showBackButton]="true"
+  backRoute="/admin/medicos">
+</app-page-header>
+
+<div class="medico-detail-container">
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-content">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <h5>Cargando información del médico...</h5>
+      <p class="text-muted">Por favor espera mientras obtenemos los datos</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <div class="error-content">
+      <i class="bi bi-exclamation-triangle-fill text-danger mb-3"></i>
+      <h5>Error al cargar información</h5>
+      <p class="text-muted mb-3">{{ error }}</p>
+      <button class="btn btn-outline-primary" (click)="ngOnInit()">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error && medico" class="content-section">
+    <div class="row g-4">
+      <div class="col-md-8">
+        <!-- Información Principal -->
+        <div class="detail-card">
+          <div class="card-header">
+            <div class="header-content">
+              <div class="medico-avatar-large">
+                {{ getInitials(medico.nombre) }}
+              </div>
+              <div class="header-info">
+                <h3 class="medico-name">{{ medico.nombre }}</h3>
+                <div class="medico-meta">
+                  <span class="specialty-badge">
+                    <i class="bi bi-heart-pulse me-1"></i>
+                    {{ medico.especialidad || 'Especialidad no registrada' }}
+                  </span>
+                  <span class="status-badge" [ngClass]="{
+                    'status-active': medico.estado_id === 1,
+                    'status-inactive': medico.estado_id === 2,
+                    'status-unknown': !medico.estado_id
+                  }">
+                    <i class="bi" [ngClass]="{
+                      'bi-check-circle-fill': medico.estado_id === 1,
+                      'bi-x-circle-fill': medico.estado_id === 2,
+                      'bi-question-circle-fill': !medico.estado_id
+                    }"></i>
+                    {{ estado?.nombre || 'Sin estado' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-card-text me-2"></i>
+                  Número de Colegiatura
+                </div>
+                <div class="info-value">{{ medico.nro_colegiatura || 'No registrado' }}</div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-telephone me-2"></i>
+                  Teléfono
+                </div>
+                <div class="info-value">
+                  <a *ngIf="medico.telefono" href="tel:{{ medico.telefono }}" class="contact-link">
+                    {{ medico.telefono }}
+                  </a>
+                  <span *ngIf="!medico.telefono" class="text-muted">No registrado</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <div class="info-label">
+                  <i class="bi bi-envelope me-2"></i>
+                  Email
+                </div>
+                <div class="info-value">
+                  <a *ngIf="medico.email" href="mailto:{{ medico.email }}" class="contact-link">
+                    {{ medico.email }}
+                  </a>
+                  <span *ngIf="!medico.email" class="text-muted">No registrado</span>
+                </div>
+              </div>
+              
+              <div class="info-item" *ngIf="usuario">
+                <div class="info-label">
+                  <i class="bi bi-person me-2"></i>
+                  Usuario del Sistema
+                </div>
+                <div class="info-value">
+                  <a [routerLink]="['/admin/usuarios/detail', usuario.id]" class="user-link">
+                    {{ usuario.email }}
+                    <i class="bi bi-box-arrow-up-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- Acciones Rápidas -->
+        <div class="actions-card">
+          <div class="card-header">
+            <h5 class="card-title">
+              <i class="bi bi-lightning me-2"></i>
+              Acciones Rápidas
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="action-buttons">
+              <button class="action-btn action-primary" [routerLink]="['/admin/medicos/edit', medico.id]">
+                <div class="action-icon">
+                  <i class="bi bi-pencil"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Editar Médico</div>
+                  <div class="action-description">Modificar información</div>
+                </div>
+              </button>
+              
+              <button *ngIf="usuario" class="action-btn action-info" [routerLink]="['/admin/usuarios/detail', usuario.id]">
+                <div class="action-icon">
+                  <i class="bi bi-person"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Ver Usuario</div>
+                  <div class="action-description">Información del usuario</div>
+                </div>
+              </button>
+              
+              <button class="action-btn action-secondary" disabled>
+                <div class="action-icon">
+                  <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Ver Horarios</div>
+                  <div class="action-description">Próximamente</div>
+                </div>
+              </button>
+              
+              <button class="action-btn action-secondary" disabled>
+                <div class="action-icon">
+                  <i class="bi bi-calendar-week"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">Ver Citas</div>
+                  <div class="action-description">Próximamente</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="page-header" [style.background]="'linear-gradient(135deg, ' + primaryColor + ' 0%, ' + secondaryColor + ' 100%)'">
+  <div class="header-content">
+    <div class="header-info">
+      <h1 class="page-title">
+        <i [class]="icon + ' me-3'" *ngIf="icon"></i>
+        {{ title }}
+      </h1>
+      <p *ngIf="subtitle" class="page-subtitle">{{ subtitle }}</p>
+    </div>
+    <div class="header-actions" *ngIf="computedShowAction && computedActionRoute">
+      <!-- Back button style -->
+      <a *ngIf="actionType === 'back'" [routerLink]="computedActionRoute" class="btn-back">
+        <i class="bi {{ actionIcon }}"></i>
+        {{ computedActionText }}
+      </a>
+      <!-- Action button style -->
+      <button *ngIf="actionType === 'button'" class="btn btn-primary btn-modern" [routerLink]="[computedActionRoute]">
+        <i [class]="actionIcon + ' me-2'" *ngIf="actionIcon"></i>
+        {{ computedActionText }}
+      </button>
+    </div>
+  </div>
+</div>
