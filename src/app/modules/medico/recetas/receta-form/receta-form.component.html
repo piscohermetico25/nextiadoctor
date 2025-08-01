@@ -1,0 +1,323 @@
+<div class="receta-form-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">
+          <i class="bi bi-prescription2 me-3"></i>
+          {{ duplicarRecetaId ? 'Duplicar Receta' : 'Nueva Receta Médica' }}
+        </h1>
+        <p class="page-subtitle">
+          {{ consultaId ? 'Generar receta desde consulta médica' : 'Crear nueva prescripción electrónica' }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline-light" (click)="onCancel()">
+          <i class="bi bi-arrow-left me-2"></i>
+          Volver
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="form-section">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="form-card">
+          <form [formGroup]="recetaForm" (ngSubmit)="onSubmit()">
+            
+            <!-- Información del Paciente -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-person-heart me-2"></i>
+                Información del Paciente
+              </h4>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <label for="pacienteId" class="form-label required">Seleccionar Paciente</label>
+                <select 
+                  id="pacienteId"
+                  class="form-select"
+                  formControlName="pacienteId"
+                  [class.is-invalid]="isFieldInvalid('pacienteId')">
+                  <option value="">Seleccione un paciente...</option>
+                  <option *ngFor="let paciente of pacientes" [value]="paciente.id">
+                    {{ paciente.nombre }} - {{ paciente.documento }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('pacienteId')">
+                  {{ getFieldError('pacienteId') }}
+                </div>
+                
+                <!-- Información adicional del paciente seleccionado -->
+                <div class="patient-info" *ngIf="recetaForm.get('pacienteId')?.value">
+                  <div class="patient-details">
+                    <div class="patient-main">
+                      <span class="patient-name">
+                        <i class="bi bi-person-circle me-2"></i>
+                        {{ getPacienteInfo(+recetaForm.get('pacienteId')?.value!)?.nombre }}
+                      </span>
+                      <span class="patient-age">
+                        <i class="bi bi-calendar me-2"></i>
+                        {{ getPacienteInfo(+recetaForm.get('pacienteId')?.value!)?.edad }} años
+                      </span>
+                    </div>
+                    <div class="patient-contact">
+                      <span class="patient-phone">
+                        <i class="bi bi-telephone me-2"></i>
+                        {{ getPacienteInfo(+recetaForm.get('pacienteId')?.value!)?.telefono }}
+                      </span>
+                      <span class="patient-email">
+                        <i class="bi bi-envelope me-2"></i>
+                        {{ getPacienteInfo(+recetaForm.get('pacienteId')?.value!)?.email }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información Médica -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-stethoscope me-2"></i>
+                Información Médica
+              </h4>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <label for="diagnostico" class="form-label required">Diagnóstico</label>
+                <textarea 
+                  id="diagnostico"
+                  class="form-control"
+                  rows="3"
+                  formControlName="diagnostico"
+                  placeholder="Ingrese el diagnóstico principal..."
+                  [class.is-invalid]="isFieldInvalid('diagnostico')"></textarea>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('diagnostico')">
+                  {{ getFieldError('diagnostico') }}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <label for="fechaVencimiento" class="form-label required">Fecha de Vencimiento</label>
+                <input 
+                  type="date" 
+                  id="fechaVencimiento"
+                  class="form-control"
+                  formControlName="fechaVencimiento"
+                  [class.is-invalid]="isFieldInvalid('fechaVencimiento')">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('fechaVencimiento')">
+                  {{ getFieldError('fechaVencimiento') }}
+                </div>
+                <small class="form-text text-muted">
+                  La receta será válida hasta esta fecha
+                </small>
+              </div>
+            </div>
+
+            <!-- Medicamentos -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-capsule me-2"></i>
+                Medicamentos Prescritos
+              </h4>
+              <button 
+                type="button" 
+                class="btn btn-outline-primary btn-sm"
+                (click)="agregarMedicamento()">
+                <i class="bi bi-plus-circle me-2"></i>
+                Agregar Medicamento
+              </button>
+            </div>
+            
+            <div class="medicamentos-section" formArrayName="medicamentos">
+              <div 
+                class="medicamento-card" 
+                *ngFor="let medicamento of medicamentos.controls; let i = index"
+                [formGroupName]="i">
+                
+                <div class="medicamento-header">
+                  <h6>
+                    <i class="bi bi-capsule-pill me-2"></i>
+                    Medicamento {{ i + 1 }}
+                  </h6>
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="eliminarMedicamento(i)"
+                    [disabled]="medicamentos.length === 1"
+                    title="Eliminar medicamento">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label [for]="'medicamento-' + i" class="form-label required">Medicamento</label>
+                    <select 
+                      [id]="'medicamento-' + i"
+                      class="form-select"
+                      formControlName="medicamento"
+                      (change)="onMedicamentoChange(i, $event.target?.value || '')"
+                      [class.is-invalid]="isFieldInvalid('medicamento', i)">
+                      <option value="">Seleccione un medicamento...</option>
+                      <option *ngFor="let med of medicamentosDisponibles" [value]="med.nombre">
+                        {{ med.nombre }} ({{ med.principioActivo }})
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('medicamento', i)">
+                      {{ getFieldError('medicamento', i) }}
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-3">
+                    <label [for]="'dosis-' + i" class="form-label required">Dosis</label>
+                    <input 
+                      type="text" 
+                      [id]="'dosis-' + i"
+                      class="form-control"
+                      formControlName="dosis"
+                      placeholder="ej: 1 tableta"
+                      [class.is-invalid]="isFieldInvalid('dosis', i)">
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('dosis', i)">
+                      {{ getFieldError('dosis', i) }}
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-3">
+                    <label [for]="'frecuencia-' + i" class="form-label required">Frecuencia</label>
+                    <select 
+                      [id]="'frecuencia-' + i"
+                      class="form-select"
+                      formControlName="frecuencia"
+                      [class.is-invalid]="isFieldInvalid('frecuencia', i)">
+                      <option value="">Seleccionar...</option>
+                      <option value="Cada 4 horas">Cada 4 horas</option>
+                      <option value="Cada 6 horas">Cada 6 horas</option>
+                      <option value="Cada 8 horas">Cada 8 horas</option>
+                      <option value="Cada 12 horas">Cada 12 horas</option>
+                      <option value="Una vez al día">Una vez al día</option>
+                      <option value="Dos veces al día">Dos veces al día</option>
+                      <option value="Tres veces al día">Tres veces al día</option>
+                      <option value="Antes de las comidas">Antes de las comidas</option>
+                      <option value="Después de las comidas">Después de las comidas</option>
+                      <option value="Antes del desayuno">Antes del desayuno</option>
+                      <option value="Antes de dormir">Antes de dormir</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('frecuencia', i)">
+                      {{ getFieldError('frecuencia', i) }}
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-6">
+                    <label [for]="'duracion-' + i" class="form-label required">Duración del Tratamiento</label>
+                    <select 
+                      [id]="'duracion-' + i"
+                      class="form-select"
+                      formControlName="duracion"
+                      [class.is-invalid]="isFieldInvalid('duracion', i)">
+                      <option value="">Seleccionar duración...</option>
+                      <option value="3 días">3 días</option>
+                      <option value="5 días">5 días</option>
+                      <option value="7 días">7 días</option>
+                      <option value="10 días">10 días</option>
+                      <option value="14 días">14 días</option>
+                      <option value="21 días">21 días</option>
+                      <option value="30 días">30 días</option>
+                      <option value="60 días">60 días</option>
+                      <option value="90 días">90 días</option>
+                      <option value="Uso continuo">Uso continuo</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('duracion', i)">
+                      {{ getFieldError('duracion', i) }}
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-6">
+                    <label [for]="'instrucciones-' + i" class="form-label">Instrucciones Especiales</label>
+                    <textarea 
+                      [id]="'instrucciones-' + i"
+                      class="form-control"
+                      rows="2"
+                      formControlName="instrucciones"
+                      placeholder="ej: Tomar con alimentos, evitar alcohol..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observaciones Generales -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-chat-square-text me-2"></i>
+                Observaciones Generales
+              </h4>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <label for="observaciones" class="form-label">Observaciones y Recomendaciones</label>
+                <textarea 
+                  id="observaciones"
+                  class="form-control"
+                  rows="3"
+                  formControlName="observaciones"
+                  placeholder="Observaciones generales, recomendaciones adicionales, contraindicaciones..."></textarea>
+              </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="form-actions">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary me-3"
+                (click)="onCancel()"
+                [disabled]="isLoading">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancelar
+              </button>
+              
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="isLoading || recetaForm.invalid">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!isLoading" class="bi bi-check-circle me-2"></i>
+                {{ isLoading ? 'Generando...' : 'Generar Receta' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Éxito -->
+  <div class="success-overlay" *ngIf="showSuccess">
+    <div class="success-modal">
+      <div class="success-icon">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <h3>¡Receta Generada!</h3>
+      <p>La receta médica ha sido creada exitosamente con código QR.</p>
+      <div class="success-actions">
+        <button class="btn btn-outline-primary me-2">
+          <i class="bi bi-download me-2"></i>
+          Descargar PDF
+        </button>
+        <button class="btn btn-primary">
+          <i class="bi bi-envelope me-2"></i>
+          Enviar por Email
+        </button>
+      </div>
+      <div class="success-animation">
+        <div class="pulse"></div>
+      </div>
+    </div>
+  </div>
+</div>

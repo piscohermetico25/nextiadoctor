@@ -1,0 +1,313 @@
+<div class="consulta-detail-container" *ngIf="consulta">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">
+          <i class="bi bi-clipboard2-pulse me-3"></i>
+          Consulta Médica #{{ consulta.id }}
+        </h1>
+        <div class="header-badges">
+          <span class="badge status-badge" [ngClass]="getEstadoClass(consulta.estado)">
+            {{ getEstadoText(consulta.estado) }}
+          </span>
+          <span class="badge priority-badge" [ngClass]="getPrioridadClass(consulta.prioridad)">
+            {{ consulta.prioridad | titlecase }}
+          </span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline-light" (click)="onVolver()">
+          <i class="bi bi-arrow-left me-2"></i>
+          Volver
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información del Paciente -->
+  <div class="patient-info-section">
+    <div class="container">
+      <div class="patient-card">
+        <div class="patient-avatar">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div class="patient-details">
+          <h3>{{ consulta.paciente.nombre }}</h3>
+          <div class="patient-meta">
+            <span><i class="bi bi-card-text me-2"></i>{{ consulta.paciente.documento }}</span>
+            <span><i class="bi bi-telephone me-2"></i>{{ consulta.paciente.telefono }}</span>
+            <span><i class="bi bi-envelope me-2"></i>{{ consulta.paciente.email }}</span>
+            <span><i class="bi bi-calendar me-2"></i>{{ consulta.paciente.edad }} años</span>
+          </div>
+        </div>
+        <div class="consultation-meta">
+          <div class="meta-item">
+            <i class="bi bi-calendar-event"></i>
+            <div>
+              <strong>{{ consulta.fecha | date:'dd/MM/yyyy' }}</strong>
+              <small>{{ consulta.hora }}</small>
+            </div>
+          </div>
+          <div class="meta-item">
+            <i class="bi bi-clock"></i>
+            <div>
+              <strong>{{ consulta.duracion }} min</strong>
+              <small>{{ consulta.tipoConsulta | titlecase }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs de Navegación -->
+  <div class="tabs-section">
+    <div class="container">
+      <ul class="nav nav-tabs custom-tabs">
+        <li class="nav-item">
+          <button 
+            class="nav-link" 
+            [class.active]="activeTab === 'informacion'"
+            (click)="setActiveTab('informacion')">
+            <i class="bi bi-info-circle me-2"></i>
+            Información
+          </button>
+        </li>
+        <li class="nav-item">
+          <button 
+            class="nav-link" 
+            [class.active]="activeTab === 'consulta'"
+            (click)="setActiveTab('consulta')">
+            <i class="bi bi-clipboard2-pulse me-2"></i>
+            Consulta
+          </button>
+        </li>
+        <li class="nav-item">
+          <button 
+            class="nav-link" 
+            [class.active]="activeTab === 'acciones'"
+            (click)="setActiveTab('acciones')">
+            <i class="bi bi-gear me-2"></i>
+            Acciones
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Contenido de Tabs -->
+  <div class="tab-content-section">
+    <div class="container">
+      
+      <!-- Tab Información -->
+      <div class="tab-pane" [class.active]="activeTab === 'informacion'">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h5><i class="bi bi-clipboard-data me-2"></i>Motivo de Consulta</h5>
+              <p>{{ consulta.motivo }}</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h5><i class="bi bi-chat-text me-2"></i>Observaciones Iniciales</h5>
+              <p>{{ consulta.observaciones || 'Sin observaciones adicionales' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Consulta -->
+      <div class="tab-pane" [class.active]="activeTab === 'consulta'">
+        <form [formGroup]="consultaForm">
+          <div class="row g-4">
+            <div class="col-12">
+              <div class="consultation-actions" *ngIf="consulta.estado === 'programada'">
+                <button class="btn btn-success btn-lg" (click)="iniciarConsulta()">
+                  <i class="bi bi-play-circle me-2"></i>
+                  Iniciar Consulta
+                </button>
+              </div>
+            </div>
+            
+            <div class="col-lg-6">
+              <div class="form-card">
+                <h5><i class="bi bi-stethoscope me-2"></i>Diagnóstico</h5>
+                <textarea 
+                  class="form-control"
+                  rows="4"
+                  formControlName="diagnostico"
+                  placeholder="Ingrese el diagnóstico..."
+                  [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+            
+            <div class="col-lg-6">
+              <div class="form-card">
+                <h5><i class="bi bi-prescription2 me-2"></i>Tratamiento</h5>
+                <textarea 
+                  class="form-control"
+                  rows="4"
+                  formControlName="tratamiento"
+                  placeholder="Ingrese el tratamiento recomendado..."
+                  [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+            
+            <div class="col-12">
+              <div class="form-card">
+                <h5><i class="bi bi-graph-up me-2"></i>Evolución del Paciente</h5>
+                <textarea 
+                  class="form-control"
+                  rows="3"
+                  formControlName="evolucion"
+                  placeholder="Describa la evolución del paciente..."
+                  [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+            
+            <div class="col-lg-6">
+              <div class="form-card">
+                <h5><i class="bi bi-calendar-plus me-2"></i>Próxima Cita</h5>
+                <input 
+                  type="date" 
+                  class="form-control"
+                  formControlName="proximaCita"
+                  [readonly]="!isEditing">
+              </div>
+            </div>
+            
+            <div class="col-lg-6">
+              <div class="form-card">
+                <h5><i class="bi bi-chat-square-text me-2"></i>Observaciones Adicionales</h5>
+                <textarea 
+                  class="form-control"
+                  rows="3"
+                  formControlName="observaciones"
+                  placeholder="Observaciones adicionales..."
+                  [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Botones de Acción del Formulario -->
+          <div class="form-actions" *ngIf="consulta.estado === 'en_curso'">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <button 
+                  type="button" 
+                  class="btn btn-outline-primary me-3"
+                  (click)="toggleEdit()"
+                  *ngIf="!isEditing">
+                  <i class="bi bi-pencil me-2"></i>
+                  Editar
+                </button>
+                
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary me-3"
+                  (click)="toggleEdit()"
+                  *ngIf="isEditing">
+                  <i class="bi bi-x-circle me-2"></i>
+                  Cancelar
+                </button>
+                
+                <button 
+                  type="button" 
+                  class="btn btn-primary me-3"
+                  (click)="guardarCambios()"
+                  [disabled]="isLoading"
+                  *ngIf="isEditing">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!isLoading" class="bi bi-check-circle me-2"></i>
+                  {{ isLoading ? 'Guardando...' : 'Guardar' }}
+                </button>
+              </div>
+              
+              <button 
+                type="button" 
+                class="btn btn-success btn-lg"
+                (click)="completarConsulta()"
+                [disabled]="!consultaForm.get('diagnostico')?.value">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                Completar Consulta
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tab Acciones -->
+      <div class="tab-pane" [class.active]="activeTab === 'acciones'">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="action-card">
+              <div class="action-icon">
+                <i class="bi bi-prescription2"></i>
+              </div>
+              <h5>Generar Receta</h5>
+              <p>Crear receta electrónica con medicamentos prescritos</p>
+              <button 
+                class="btn btn-primary"
+                (click)="generarReceta()"
+                [disabled]="consulta.estado !== 'completada'">
+                <i class="bi bi-plus-circle me-2"></i>
+                Nueva Receta
+              </button>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="action-card">
+              <div class="action-icon">
+                <i class="bi bi-clipboard2-check"></i>
+              </div>
+              <h5>Solicitar Exámenes</h5>
+              <p>Solicitar exámenes de laboratorio o imágenes</p>
+              <button 
+                class="btn btn-info"
+                (click)="solicitarExamenes()">
+                <i class="bi bi-plus-circle me-2"></i>
+                Solicitar Examen
+              </button>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="action-card danger">
+              <div class="action-icon">
+                <i class="bi bi-x-circle"></i>
+              </div>
+              <h5>Cancelar Consulta</h5>
+              <p>Cancelar la consulta programada</p>
+              <button 
+                class="btn btn-danger"
+                (click)="cancelarConsulta()"
+                [disabled]="consulta.estado === 'completada' || consulta.estado === 'cancelada'">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de Éxito -->
+  <div class="success-toast" *ngIf="showSuccess">
+    <div class="toast-content">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      Cambios guardados exitosamente
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="!consulta">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+  <p class="mt-3">Cargando información de la consulta...</p>
+</div>

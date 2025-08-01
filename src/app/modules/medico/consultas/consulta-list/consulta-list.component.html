@@ -1,0 +1,149 @@
+<div class="consultas-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">
+          <i class="bi bi-clipboard2-pulse me-3"></i>
+          Gestión de Consultas
+        </h1>
+        <p class="page-subtitle">Administra y registra las consultas médicas</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" routerLink="/medico/consultas/nueva">
+          <i class="bi bi-plus-circle me-2"></i>
+          Nueva Consulta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="search-box">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Buscar por paciente o motivo..."
+            [(ngModel)]="busqueda"
+            (input)="onBusquedaChange()">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select 
+          class="form-select" 
+          [(ngModel)]="filtroEstado"
+          (change)="onFiltroChange()">
+          <option value="todas">Todas las consultas</option>
+          <option value="programada">Programadas</option>
+          <option value="en_curso">En curso</option>
+          <option value="completada">Completadas</option>
+          <option value="cancelada">Canceladas</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <div class="results-info">
+          <span class="text-muted">
+            {{ consultasFiltradas.length }} consulta(s) encontrada(s)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de consultas -->
+  <div class="consultas-grid">
+    <div class="row g-4">
+      <div class="col-12" *ngFor="let consulta of consultasFiltradas">
+        <div class="consulta-card">
+          <div class="card-header">
+            <div class="consulta-info">
+              <h5 class="paciente-nombre">
+                <i class="bi bi-person-circle me-2"></i>
+                {{ consulta.paciente }}
+              </h5>
+              <span [class]="getEstadoClass(consulta.estado)">
+                {{ consulta.estado | titlecase }}
+              </span>
+            </div>
+            <div class="consulta-fecha">
+              <i class="bi bi-calendar3 me-2"></i>
+              {{ consulta.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="consulta-details">
+                  <div class="detail-item">
+                    <strong>Motivo:</strong>
+                    <span>{{ consulta.motivo }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="consulta.diagnostico">
+                    <strong>Diagnóstico:</strong>
+                    <span>{{ consulta.diagnostico }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <strong>Duración:</strong>
+                    <span>{{ consulta.duracion }} minutos</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="consulta-actions">
+                  <button 
+                    class="btn btn-sm btn-outline-primary me-2"
+                    [routerLink]="['/medico/consultas', consulta.id]">
+                    <i class="bi bi-eye me-1"></i>
+                    Ver Detalle
+                  </button>
+                  
+                  <button 
+                    *ngIf="consulta.estado === 'programada'"
+                    class="btn btn-sm btn-success me-2"
+                    (click)="iniciarConsulta(consulta)">
+                    <i class="bi bi-play-circle me-1"></i>
+                    Iniciar
+                  </button>
+                  
+                  <button 
+                    *ngIf="consulta.estado === 'en_curso'"
+                    class="btn btn-sm btn-primary me-2"
+                    (click)="completarConsulta(consulta)">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Completar
+                  </button>
+                  
+                  <button 
+                    *ngIf="consulta.estado === 'programada'"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="cancelarConsulta(consulta)">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Estado vacío -->
+    <div class="empty-state" *ngIf="consultasFiltradas.length === 0">
+      <div class="empty-icon">
+        <i class="bi bi-clipboard2-x"></i>
+      </div>
+      <h3>No se encontraron consultas</h3>
+      <p class="text-muted">No hay consultas que coincidan con los filtros seleccionados.</p>
+      <button class="btn btn-primary" routerLink="/medico/consultas/nueva">
+        <i class="bi bi-plus-circle me-2"></i>
+        Programar Primera Consulta
+      </button>
+    </div>
+  </div>
+</div>

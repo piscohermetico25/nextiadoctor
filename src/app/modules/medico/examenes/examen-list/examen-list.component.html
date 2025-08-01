@@ -1,0 +1,264 @@
+<div class="examenes-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">
+          <i class="fas fa-file-medical me-3"></i>
+          Gestión de Exámenes
+        </h1>
+        <p class="page-subtitle">Administra las solicitudes y resultados de exámenes médicos</p>
+      </div>
+      <button class="btn btn-outline-light" (click)="navigateToNewExamen()">
+        <i class="fas fa-plus me-2"></i>
+        Nueva Solicitud
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <div class="row g-3">
+        <!-- Search -->
+        <div class="col-md-4">
+          <div class="search-group">
+            <i class="fas fa-search search-icon"></i>
+            <input 
+              type="text" 
+              class="form-control search-input" 
+              placeholder="Buscar por paciente, documento, tipo de examen..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()">
+          </div>
+        </div>
+
+        <!-- Estado Filter -->
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedEstado" (change)="onFilterChange()">
+            <option *ngFor="let estado of estados" [value]="estado.value">
+              {{ estado.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Categoría Filter -->
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedCategoria" (change)="onFilterChange()">
+            <option *ngFor="let categoria of categorias" [value]="categoria.value">
+              {{ categoria.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Prioridad Filter -->
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedPrioridad" (change)="onFilterChange()">
+            <option *ngFor="let prioridad of prioridades" [value]="prioridad.value">
+              {{ prioridad.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="col-md-2">
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+            <i class="fas fa-times me-2"></i>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Info -->
+  <div class="results-info">
+    <div class="results-count">
+      <i class="fas fa-list-ul me-2"></i>
+      Mostrando {{ filteredExamenes.length }} de {{ examenes.length }} exámenes
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Cargando exámenes...</p>
+    </div>
+  </div>
+
+  <!-- Examenes Grid -->
+  <div *ngIf="!loading" class="examenes-grid">
+    <div *ngFor="let examen of filteredExamenes" class="examen-card" [class.urgent]="isUrgent(examen)">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="examen-info">
+          <div class="examen-id">
+            <i [class]="getCategoriaIcon(examen.categoria)" class="me-2"></i>
+            <strong>{{ examen.id }}</strong>
+          </div>
+          <div class="examen-date">
+            <i class="fas fa-calendar me-1"></i>
+            {{ formatDate(examen.fecha) }}
+          </div>
+        </div>
+        <div class="examen-badges">
+          <span class="badge" [class]="getEstadoClass(examen.estado)">
+            <i [class]="getEstadoIcon(examen.estado)" class="me-1"></i>
+            {{ examen.estado | titlecase }}
+          </span>
+          <span class="badge" [class]="getPrioridadClass(examen.prioridad)">
+            {{ examen.prioridad | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+        <!-- Patient Info -->
+        <div class="patient-section">
+          <div class="patient-main">
+            <h6 class="patient-name">
+              <i class="fas fa-user me-2"></i>
+              {{ examen.paciente.nombre }}
+            </h6>
+            <div class="patient-details">
+              <span class="patient-doc">
+                <i class="fas fa-id-card me-1"></i>
+                {{ examen.paciente.documento }}
+              </span>
+              <span class="patient-contact">
+                <i class="fas fa-phone me-1"></i>
+                {{ examen.paciente.telefono }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exam Details -->
+        <div class="exam-details">
+          <div class="exam-type">
+            <strong>Tipo de Examen:</strong>
+            <span>{{ examen.tipoExamen }}</span>
+          </div>
+          <div class="exam-category">
+            <strong>Categoría:</strong>
+            <span class="category-badge category-{{ examen.categoria }}">
+              <i [class]="getCategoriaIcon(examen.categoria)" class="me-1"></i>
+              {{ examen.categoria | titlecase }}
+            </span>
+          </div>
+          <div *ngIf="examen.laboratorio" class="exam-lab">
+            <strong>Laboratorio:</strong>
+            <span>{{ examen.laboratorio }}</span>
+          </div>
+          <div *ngIf="examen.observaciones" class="exam-observations">
+            <strong>Observaciones:</strong>
+            <span>{{ examen.observaciones }}</span>
+          </div>
+        </div>
+
+        <!-- Scheduled Date -->
+        <div *ngIf="examen.fechaProgramada" class="scheduled-info">
+          <i class="fas fa-calendar-check me-2"></i>
+          <strong>Programado para:</strong> {{ formatDate(examen.fechaProgramada) }}
+        </div>
+
+        <!-- Results Info -->
+        <div *ngIf="hasResults(examen)" class="results-info-card">
+          <div class="results-header">
+            <i class="fas fa-file-medical-alt me-2"></i>
+            <strong>Resultados disponibles</strong>
+            <span class="result-date">{{ formatDateShort(examen.fechaResultado!) }}</span>
+          </div>
+          <div class="results-preview">
+            {{ examen.resultados }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Actions -->
+      <div class="card-actions">
+        <div class="action-buttons">
+          <!-- View Details -->
+          <button 
+            class="btn btn-outline-primary btn-sm"
+            (click)="navigateToExamenDetail(examen.id)"
+            title="Ver detalles">
+            <i class="fas fa-eye"></i>
+          </button>
+
+          <!-- Schedule (if solicitado) -->
+          <button 
+            *ngIf="canSchedule(examen)"
+            class="btn btn-outline-info btn-sm"
+            (click)="programarExamen(examen)"
+            title="Programar examen">
+            <i class="fas fa-calendar-plus"></i>
+          </button>
+
+          <!-- View Results (if completed) -->
+          <button 
+            *ngIf="hasResults(examen)"
+            class="btn btn-outline-success btn-sm"
+            (click)="verResultados(examen)"
+            title="Ver resultados">
+            <i class="fas fa-file-medical-alt"></i>
+          </button>
+
+          <!-- Download Results (if completed) -->
+          <button 
+            *ngIf="hasResults(examen)"
+            class="btn btn-outline-secondary btn-sm"
+            (click)="descargarResultados(examen)"
+            title="Descargar resultados">
+            <i class="fas fa-download"></i>
+          </button>
+
+          <!-- Duplicate Request -->
+          <button 
+            class="btn btn-outline-warning btn-sm"
+            (click)="duplicarSolicitud(examen)"
+            title="Duplicar solicitud">
+            <i class="fas fa-copy"></i>
+          </button>
+
+          <!-- Cancel (if can cancel) -->
+          <button 
+            *ngIf="canCancel(examen)"
+            class="btn btn-outline-danger btn-sm"
+            (click)="cancelarExamen(examen)"
+            title="Cancelar examen">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredExamenes.length === 0" class="empty-state">
+    <div class="empty-content">
+      <i class="fas fa-file-medical empty-icon"></i>
+      <h3>No se encontraron exámenes</h3>
+      <p *ngIf="searchTerm || selectedEstado || selectedCategoria || selectedPrioridad; else noExamenesMessage">
+        No hay exámenes que coincidan con los filtros aplicados.
+        <br>
+        <button class="btn btn-link p-0" (click)="clearFilters()">
+          Limpiar filtros
+        </button>
+      </p>
+      <ng-template #noExamenesMessage>
+        <p>
+          Aún no has solicitado ningún examen médico.
+          <br>
+          Comienza creando tu primera solicitud.
+        </p>
+        <button class="btn btn-primary" (click)="navigateToNewExamen()">
+          <i class="fas fa-plus me-2"></i>
+          Nueva Solicitud de Examen
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</div>

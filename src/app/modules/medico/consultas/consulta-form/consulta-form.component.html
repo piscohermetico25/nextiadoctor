@@ -1,0 +1,222 @@
+<div class="consulta-form-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">
+          <i class="bi bi-plus-circle me-3"></i>
+          Nueva Consulta Médica
+        </h1>
+        <p class="page-subtitle">Programa una nueva consulta con el paciente</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline-light" (click)="onCancel()">
+          <i class="bi bi-arrow-left me-2"></i>
+          Volver
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="form-section">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="form-card">
+          <form [formGroup]="consultaForm" (ngSubmit)="onSubmit()">
+            
+            <!-- Información del Paciente -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-person-heart me-2"></i>
+                Información del Paciente
+              </h4>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <label for="pacienteId" class="form-label required">Seleccionar Paciente</label>
+                <select 
+                  id="pacienteId"
+                  class="form-select"
+                  formControlName="pacienteId"
+                  [class.is-invalid]="isFieldInvalid('pacienteId')">
+                  <option value="">Seleccione un paciente...</option>
+                  <option *ngFor="let paciente of pacientes" [value]="paciente.id">
+                    {{ paciente.nombre }} - {{ paciente.documento }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('pacienteId')">
+                  {{ getFieldError('pacienteId') }}
+                </div>
+                
+                <!-- Información adicional del paciente seleccionado -->
+                <div class="patient-info" *ngIf="consultaForm.get('pacienteId')?.value">
+                  <div class="patient-details">
+                    <span class="patient-name">
+                      <i class="bi bi-person-circle me-2"></i>
+                      {{ getPacienteInfo(+consultaForm.get('pacienteId')?.value!)?.nombre }}
+                    </span>
+                    <span class="patient-phone">
+                      <i class="bi bi-telephone me-2"></i>
+                      {{ getPacienteInfo(+consultaForm.get('pacienteId')?.value!)?.telefono }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Programación de la Consulta -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-calendar-check me-2"></i>
+                Programación de la Consulta
+              </h4>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="fecha" class="form-label required">Fecha</label>
+                <input 
+                  type="date" 
+                  id="fecha"
+                  class="form-control"
+                  formControlName="fecha"
+                  [class.is-invalid]="isFieldInvalid('fecha')">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('fecha')">
+                  {{ getFieldError('fecha') }}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="hora" class="form-label required">Hora</label>
+                <input 
+                  type="time" 
+                  id="hora"
+                  class="form-control"
+                  formControlName="hora"
+                  [class.is-invalid]="isFieldInvalid('hora')">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('hora')">
+                  {{ getFieldError('hora') }}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="duracion" class="form-label required">Duración (minutos)</label>
+                <select 
+                  id="duracion"
+                  class="form-select"
+                  formControlName="duracion"
+                  [class.is-invalid]="isFieldInvalid('duracion')">
+                  <option value="15">15 minutos</option>
+                  <option value="30">30 minutos</option>
+                  <option value="45">45 minutos</option>
+                  <option value="60">60 minutos</option>
+                  <option value="90">90 minutos</option>
+                  <option value="120">120 minutos</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('duracion')">
+                  {{ getFieldError('duracion') }}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="tipoConsulta" class="form-label required">Tipo de Consulta</label>
+                <select 
+                  id="tipoConsulta"
+                  class="form-select"
+                  formControlName="tipoConsulta">
+                  <option value="presencial">Presencial</option>
+                  <option value="telemedicina">Telemedicina</option>
+                  <option value="domicilio">A domicilio</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Detalles de la Consulta -->
+            <div class="form-section-header">
+              <h4>
+                <i class="bi bi-clipboard2-pulse me-2"></i>
+                Detalles de la Consulta
+              </h4>
+            </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <label for="motivo" class="form-label required">Motivo de la Consulta</label>
+                <textarea 
+                  id="motivo"
+                  class="form-control"
+                  rows="3"
+                  formControlName="motivo"
+                  placeholder="Describe el motivo principal de la consulta..."
+                  [class.is-invalid]="isFieldInvalid('motivo')"></textarea>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('motivo')">
+                  {{ getFieldError('motivo') }}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="prioridad" class="form-label required">Prioridad</label>
+                <select 
+                  id="prioridad"
+                  class="form-select"
+                  formControlName="prioridad">
+                  <option value="baja">Baja</option>
+                  <option value="normal">Normal</option>
+                  <option value="alta">Alta</option>
+                  <option value="urgente">Urgente</option>
+                </select>
+              </div>
+              
+              <div class="col-12">
+                <label for="observaciones" class="form-label">Observaciones Adicionales</label>
+                <textarea 
+                  id="observaciones"
+                  class="form-control"
+                  rows="2"
+                  formControlName="observaciones"
+                  placeholder="Observaciones o notas adicionales (opcional)..."></textarea>
+              </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="form-actions">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary me-3"
+                (click)="onCancel()"
+                [disabled]="isLoading">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancelar
+              </button>
+              
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="isLoading || consultaForm.invalid">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!isLoading" class="bi bi-check-circle me-2"></i>
+                {{ isLoading ? 'Programando...' : 'Programar Consulta' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Éxito -->
+  <div class="success-overlay" *ngIf="showSuccess">
+    <div class="success-modal">
+      <div class="success-icon">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <h3>¡Consulta Programada!</h3>
+      <p>La consulta ha sido programada exitosamente.</p>
+      <div class="success-animation">
+        <div class="pulse"></div>
+      </div>
+    </div>
+  </div>
+</div>

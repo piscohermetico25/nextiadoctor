@@ -1,0 +1,360 @@
+<div class="examen-form-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">
+          <i class="fas fa-file-medical me-3"></i>
+          Nueva Solicitud de Examen
+        </h1>
+        <p class="page-subtitle">Solicita exámenes médicos para tus pacientes</p>
+      </div>
+      <button class="btn btn-outline-light" (click)="onCancel()">
+        <i class="fas fa-arrow-left me-2"></i>
+        Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  <div class="form-section">
+    <form [formGroup]="examenForm" (ngSubmit)="onSubmit()" class="form-card">
+      
+      <!-- Patient Information -->
+      <div class="form-section-header">
+        <h4>
+          <i class="fas fa-user me-2"></i>
+          Información del Paciente
+        </h4>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label required">
+            <i class="fas fa-user me-2"></i>
+            Paciente
+          </label>
+          <select 
+            class="form-select"
+            formControlName="pacienteId"
+            (change)="onPacienteChange()"
+            [class.is-invalid]="isFieldInvalid('pacienteId')">
+            <option value="">Seleccionar paciente</option>
+            <option *ngFor="let paciente of pacientes" [value]="paciente.id">
+              {{ paciente.nombre }} - {{ paciente.documento }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('pacienteId')" class="invalid-feedback">
+            {{ getFieldError('pacienteId') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Patient Details -->
+      <div *ngIf="selectedPaciente" class="patient-info">
+        <div class="patient-details">
+          <div class="patient-main">
+            <div class="patient-name">
+              <i class="fas fa-user me-2"></i>
+              {{ selectedPaciente.nombre }}
+            </div>
+            <div class="patient-age">
+              <i class="fas fa-birthday-cake me-2"></i>
+              {{ selectedPaciente.edad }} años
+            </div>
+          </div>
+          <div class="patient-contact">
+            <div class="patient-phone">
+              <i class="fas fa-phone me-2"></i>
+              {{ selectedPaciente.telefono }}
+            </div>
+            <div class="patient-email">
+              <i class="fas fa-envelope me-2"></i>
+              {{ selectedPaciente.email }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Information -->
+      <div class="form-section-header">
+        <h4>
+          <i class="fas fa-file-medical me-2"></i>
+          Información del Examen
+        </h4>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label class="form-label required">
+            <i class="fas fa-list me-2"></i>
+            Categoría
+          </label>
+          <select 
+            class="form-select"
+            formControlName="categoria"
+            (change)="onCategoriaChange()"
+            [class.is-invalid]="isFieldInvalid('categoria')">
+            <option *ngFor="let categoria of categorias" [value]="categoria.value">
+              {{ categoria.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('categoria')" class="invalid-feedback">
+            {{ getFieldError('categoria') }}
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label required">
+            <i class="fas fa-flask me-2"></i>
+            Tipo de Examen
+          </label>
+          <select 
+            class="form-select"
+            formControlName="tipoExamenId"
+            (change)="onTipoExamenChange()"
+            [class.is-invalid]="isFieldInvalid('tipoExamenId')"
+            [disabled]="!examenForm.get('categoria')?.value">
+            <option value="">Seleccionar tipo de examen</option>
+            <option *ngFor="let tipo of getTiposExamenFiltrados()" [value]="tipo.id">
+              {{ tipo.nombre }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('tipoExamenId')" class="invalid-feedback">
+            {{ getFieldError('tipoExamenId') }}
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label required">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Prioridad
+          </label>
+          <select 
+            class="form-select"
+            formControlName="prioridad"
+            [class.is-invalid]="isFieldInvalid('prioridad')">
+            <option *ngFor="let prioridad of prioridades" [value]="prioridad.value">
+              {{ prioridad.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('prioridad')" class="invalid-feedback">
+            {{ getFieldError('prioridad') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Details -->
+      <div *ngIf="selectedTipoExamen" class="exam-details-card">
+        <div class="exam-header">
+          <div class="exam-title">
+            <i [class]="getCategoriaIcon(selectedTipoExamen.categoria)" class="me-2"></i>
+            {{ selectedTipoExamen.nombre }}
+          </div>
+          <span class="badge" [class]="getPrioridadClass(examenForm.get('prioridad')?.value)">
+            {{ examenForm.get('prioridad')?.value | titlecase }}
+          </span>
+        </div>
+        <div class="exam-description">
+          {{ selectedTipoExamen.descripcion }}
+        </div>
+        <div class="exam-info">
+          <div class="info-item">
+            <strong>Tiempo de resultado:</strong> {{ selectedTipoExamen.tiempoResultado }}
+          </div>
+          <div *ngIf="selectedTipoExamen.ayuno" class="info-item ayuno-required">
+            <i class="fas fa-utensils me-2"></i>
+            <strong>Requiere ayuno</strong>
+          </div>
+          <div *ngIf="selectedTipoExamen.preparacion" class="info-item preparation">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Preparación:</strong> {{ selectedTipoExamen.preparacion }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Laboratory Selection -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label">
+            <i class="fas fa-hospital me-2"></i>
+            Laboratorio/Centro (Opcional)
+          </label>
+          <select class="form-select" formControlName="laboratorioId">
+            <option value="">Seleccionar laboratorio</option>
+            <option *ngFor="let lab of getLaboratoriosFiltrados()" [value]="lab.id">
+              {{ lab.nombre }} - {{ lab.direccion }}
+            </option>
+          </select>
+          <div class="form-text">
+            Si no selecciona, el paciente podrá elegir el laboratorio de su preferencia
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduling -->
+      <div class="form-section-header">
+        <h4>
+          <i class="fas fa-calendar me-2"></i>
+          Programación (Opcional)
+        </h4>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label class="form-label">
+            <i class="fas fa-calendar-day me-2"></i>
+            Fecha Preferida
+          </label>
+          <input 
+            type="date" 
+            class="form-control"
+            formControlName="fechaPreferida"
+            [min]="getMinDate()">
+          <div class="form-text">
+            Fecha sugerida para realizar el examen
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">
+            <i class="fas fa-clock me-2"></i>
+            Hora Preferida
+          </label>
+          <input 
+            type="time" 
+            class="form-control"
+            formControlName="horaPreferida">
+          <div class="form-text">
+            Hora sugerida para realizar el examen
+          </div>
+        </div>
+      </div>
+
+      <!-- Special Instructions -->
+      <div class="form-section-header">
+        <h4>
+          <i class="fas fa-notes-medical me-2"></i>
+          Indicaciones Médicas
+        </h4>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <label class="form-label">
+            <i class="fas fa-stethoscope me-2"></i>
+            Indicaciones Médicas
+          </label>
+          <textarea 
+            class="form-control"
+            formControlName="indicacionesMedicas"
+            rows="3"
+            placeholder="Indicaciones específicas para el examen..."></textarea>
+          <div class="form-text">
+            Información clínica relevante para el laboratorio
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">
+            <i class="fas fa-comment me-2"></i>
+            Observaciones Adicionales
+          </label>
+          <textarea 
+            class="form-control"
+            formControlName="observaciones"
+            rows="3"
+            placeholder="Observaciones adicionales..."></textarea>
+          <div class="form-text">
+            Información adicional sobre el paciente o el examen
+          </div>
+        </div>
+      </div>
+
+      <!-- Special Preparation -->
+      <div *ngIf="selectedTipoExamen?.ayuno || selectedTipoExamen?.preparacion" class="preparation-section">
+        <div class="form-section-header">
+          <h4>
+            <i class="fas fa-clipboard-list me-2"></i>
+            Preparación del Paciente
+          </h4>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12">
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                formControlName="ayunoRequerido"
+                id="ayunoRequerido">
+              <label class="form-check-label" for="ayunoRequerido">
+                <i class="fas fa-utensils me-2"></i>
+                Requiere ayuno
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">
+              <i class="fas fa-list-check me-2"></i>
+              Preparación Especial
+            </label>
+            <textarea 
+              class="form-control"
+              formControlName="preparacionEspecial"
+              rows="2"
+              placeholder="Instrucciones especiales de preparación..."></textarea>
+            <div class="form-text">
+              Instrucciones específicas que debe seguir el paciente
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
+          <i class="fas fa-times me-2"></i>
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="examenForm.invalid || loading">
+          <i *ngIf="loading" class="fas fa-spinner fa-spin me-2"></i>
+          <i *ngIf="!loading" class="fas fa-paper-plane me-2"></i>
+          {{ loading ? 'Enviando...' : 'Enviar Solicitud' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div *ngIf="showSuccess" class="success-overlay">
+  <div class="success-modal">
+    <div class="success-animation">
+      <div class="pulse"></div>
+    </div>
+    <div class="success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h3>¡Solicitud Enviada!</h3>
+    <p>
+      La solicitud de examen ha sido enviada exitosamente.
+      <br>
+      El paciente recibirá las instrucciones por email.
+    </p>
+    <div class="success-actions">
+      <button class="btn btn-outline-primary" (click)="onNewExamen()">
+        <i class="fas fa-plus me-2"></i>
+        Nueva Solicitud
+      </button>
+      <button class="btn btn-primary" (click)="onSuccessClose()">
+        <i class="fas fa-list me-2"></i>
+        Ver Exámenes
+      </button>
+    </div>
+  </div>
+</div>

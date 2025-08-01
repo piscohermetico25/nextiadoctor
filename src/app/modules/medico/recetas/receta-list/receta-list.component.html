@@ -1,0 +1,253 @@
+<div class="recetas-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">
+          <i class="bi bi-prescription2 me-3"></i>
+          Gestión de Recetas
+        </h1>
+        <p class="page-subtitle">Administra las recetas médicas electrónicas</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="nuevaReceta()">
+          <i class="bi bi-plus-circle me-2"></i>
+          Nueva Receta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="container">
+      <div class="filters-card">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6">
+            <label for="search" class="form-label">
+              <i class="bi bi-search me-2"></i>
+              Buscar recetas
+            </label>
+            <input 
+              type="text" 
+              id="search"
+              class="form-control"
+              placeholder="Buscar por paciente, documento o diagnóstico..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()">
+          </div>
+          
+          <div class="col-md-4">
+            <label for="estado" class="form-label">
+              <i class="bi bi-funnel me-2"></i>
+              Filtrar por estado
+            </label>
+            <select 
+              id="estado"
+              class="form-select"
+              [(ngModel)]="selectedEstado"
+              (change)="onEstadoChange()">
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="dispensada">Dispensada</option>
+              <option value="vencida">Vencida</option>
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <div class="results-count">
+              <span class="count-number">{{ recetasFiltradas.length }}</span>
+              <span class="count-label">recetas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Recetas -->
+  <div class="recetas-section">
+    <div class="container">
+      
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3">Cargando recetas...</p>
+      </div>
+
+      <!-- Recetas Grid -->
+      <div class="recetas-grid" *ngIf="!isLoading && recetasFiltradas.length > 0">
+        <div class="receta-card" *ngFor="let receta of recetasFiltradas">
+          
+          <!-- Header de la Receta -->
+          <div class="receta-header">
+            <div class="receta-info">
+              <h5 class="receta-title">
+                <i class="bi bi-prescription2 me-2"></i>
+                Receta #{{ receta.id }}
+              </h5>
+              <span class="receta-date">
+                <i class="bi bi-calendar me-1"></i>
+                {{ receta.fecha | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+            <div class="receta-status">
+              <span class="status-badge" [ngClass]="getEstadoClass(receta.estado)">
+                <i [class]="getEstadoIcon(receta.estado) + ' me-1'"></i>
+                {{ getEstadoText(receta.estado) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Información del Paciente -->
+          <div class="patient-info">
+            <div class="patient-details">
+              <h6>
+                <i class="bi bi-person-heart me-2"></i>
+                {{ receta.paciente.nombre }}
+              </h6>
+              <p class="patient-document">
+                <i class="bi bi-card-text me-1"></i>
+                {{ receta.paciente.documento }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Diagnóstico -->
+          <div class="diagnosis-info">
+            <h6>
+              <i class="bi bi-stethoscope me-2"></i>
+              Diagnóstico
+            </h6>
+            <p>{{ receta.diagnostico }}</p>
+          </div>
+
+          <!-- Medicamentos -->
+          <div class="medications-info">
+            <h6>
+              <i class="bi bi-capsule me-2"></i>
+              Medicamentos ({{ receta.medicamentos.length }})
+            </h6>
+            <div class="medications-list">
+              <div class="medication-item" *ngFor="let medicamento of receta.medicamentos; let i = index">
+                <div class="medication-name">{{ medicamento.nombre }}</div>
+                <div class="medication-details">
+                  {{ medicamento.dosis }} - {{ medicamento.frecuencia }}
+                </div>
+              </div>
+              <div class="show-more" *ngIf="receta.medicamentos.length > 2">
+                <small class="text-muted">y {{ receta.medicamentos.length - 2 }} más...</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Vencimiento -->
+          <div class="expiry-info" *ngIf="receta.estado === 'pendiente'">
+            <div class="expiry-warning" *ngIf="diasParaVencer(receta.fechaVencimiento) <= 7 && diasParaVencer(receta.fechaVencimiento) > 0">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              Vence en {{ diasParaVencer(receta.fechaVencimiento) }} días
+            </div>
+            <div class="expiry-expired" *ngIf="isVencida(receta.fechaVencimiento)">
+              <i class="bi bi-x-circle me-2"></i>
+              Vencida el {{ receta.fechaVencimiento | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="observations-info" *ngIf="receta.observaciones">
+            <h6>
+              <i class="bi bi-chat-square-text me-2"></i>
+              Observaciones
+            </h6>
+            <p>{{ receta.observaciones }}</p>
+          </div>
+
+          <!-- Acciones -->
+          <div class="receta-actions">
+            <button 
+              class="btn btn-outline-primary btn-sm"
+              (click)="verReceta(receta.id)"
+              title="Ver detalles">
+              <i class="bi bi-eye me-1"></i>
+              Ver
+            </button>
+            
+            <button 
+              class="btn btn-outline-success btn-sm"
+              (click)="descargarPDF(receta)"
+              title="Descargar PDF">
+              <i class="bi bi-download me-1"></i>
+              PDF
+            </button>
+            
+            <button 
+              class="btn btn-outline-info btn-sm"
+              (click)="enviarPorEmail(receta)"
+              title="Enviar por email">
+              <i class="bi bi-envelope me-1"></i>
+              Email
+            </button>
+            
+            <div class="dropdown">
+              <button 
+                class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Más opciones">
+                <i class="bi bi-three-dots"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="#" (click)="duplicarReceta(receta); $event.preventDefault()">
+                    <i class="bi bi-copy me-2"></i>
+                    Duplicar receta
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#" (click)="verReceta(receta.id); $event.preventDefault()">
+                    <i class="bi bi-pencil me-2"></i>
+                    Editar
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="#">
+                    <i class="bi bi-trash me-2"></i>
+                    Eliminar
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && recetasFiltradas.length === 0">
+        <div class="empty-icon">
+          <i class="bi bi-prescription2"></i>
+        </div>
+        <h3>No se encontraron recetas</h3>
+        <p *ngIf="searchTerm || selectedEstado">
+          No hay recetas que coincidan con los filtros aplicados.
+          <br>
+          <button class="btn btn-link p-0" (click)="searchTerm = ''; selectedEstado = ''; filtrarRecetas()">
+            Limpiar filtros
+          </button>
+        </p>
+        <p *ngIf="!searchTerm && !selectedEstado">
+          Aún no has creado ninguna receta médica.
+          <br>
+          Comienza creando tu primera receta.
+        </p>
+        <button class="btn btn-primary mt-3" (click)="nuevaReceta()">
+          <i class="bi bi-plus-circle me-2"></i>
+          Crear Primera Receta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

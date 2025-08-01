@@ -45,6 +45,34 @@ export class MedicoComponent {
       route: '/medico/agenda',
       badge: 'Citas',
       badgeColor: 'medical-info'
+    },
+    { 
+      label: 'Consultas', 
+      icon: 'bi-clipboard2-pulse', 
+      route: '/medico/consultas',
+      badge: 'Médica',
+      badgeColor: 'medical-primary'
+    },
+    { 
+      label: 'Recetas', 
+      icon: 'bi-prescription2', 
+      route: '/medico/recetas',
+      badge: 'Digital',
+      badgeColor: 'medical-success'
+    },
+    { 
+      label: 'Exámenes', 
+      icon: 'bi-file-medical', 
+      route: '/medico/examenes',
+      badge: 'Lab',
+      badgeColor: 'medical-info'
+    },
+    { 
+      label: 'Mi Perfil', 
+      icon: 'bi-person-badge', 
+      route: '/medico/perfil',
+      badge: 'Médico',
+      badgeColor: 'medical-primary'
     }
   ];
   

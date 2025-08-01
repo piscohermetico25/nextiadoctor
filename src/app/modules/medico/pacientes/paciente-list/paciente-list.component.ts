@@ -3,19 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-
-interface Paciente {
-  id: number;
-  nombre: string;
-  documentoIdentidad: string;
-  sexo: 'M' | 'F';
-  fechaNacimiento: Date;
-  telefono?: string;
-  email?: string;
-  direccion?: string;
-  estado: string;
-  ultimaConsulta?: Date;
-}
+import { PacienteService } from '../../services';
+import { Paciente, PacienteFiltros, PacienteStats } from '../../models';
 
 @Component({
   selector: 'app-paciente-list',
@@ -28,11 +17,16 @@ export class PacienteListComponent implements OnInit {
   // Estado de carga
   loading = true;
   error: string | null = null;
+  exporting = false;
+  importing = false;
 
   // Filtros y búsqueda
   searchTerm = '';
   selectedEstado = '';
   selectedSexo = '';
+  selectedTipoDocumento = '';
+  selectedSeguroMedico = '';
+  selectedGrupoSanguineo = '';
 
   // Paginación
   currentPage = 1;
@@ -43,91 +37,86 @@ export class PacienteListComponent implements OnInit {
   pacientes: Paciente[] = [];
   filteredPacientes: Paciente[] = [];
   paginatedPacientes: Paciente[] = [];
+  stats: PacienteStats | null = null;
+
+  // Opciones de filtros
+  estadosOptions = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'Activo', label: 'Activo' },
+    { value: 'Inactivo', label: 'Inactivo' }
+  ];
+
+  sexoOptions = [
+    { value: '', label: 'Todos los sexos' },
+    { value: 'M', label: 'Masculino' },
+    { value: 'F', label: 'Femenino' }
+  ];
+
+  tipoDocumentoOptions = [
+    { value: '', label: 'Todos los documentos' },
+    { value: 'DNI', label: 'DNI' },
+    { value: 'CE', label: 'Carné de Extranjería' },
+    { value: 'Pasaporte', label: 'Pasaporte' }
+  ];
+
+  seguroMedicoOptions = [
+    { value: '', label: 'Todos los seguros' },
+    { value: 'EsSalud', label: 'EsSalud' },
+    { value: 'SIS', label: 'SIS' },
+    { value: 'EPS', label: 'EPS' },
+    { value: 'Particular', label: 'Particular' },
+    { value: 'Ninguno', label: 'Sin seguro' }
+  ];
+
+  grupoSanguineoOptions = [
+    { value: '', label: 'Todos los grupos' },
+    { value: 'A+', label: 'A+' },
+    { value: 'A-', label: 'A-' },
+    { value: 'B+', label: 'B+' },
+    { value: 'B-', label: 'B-' },
+    { value: 'AB+', label: 'AB+' },
+    { value: 'AB-', label: 'AB-' },
+    { value: 'O+', label: 'O+' },
+    { value: 'O-', label: 'O-' }
+  ];
 
   // Referencia a Math para usar en el template
   Math = Math;
 
+  constructor(private pacienteService: PacienteService) {}
+
   ngOnInit(): void {
     this.loadPacientes();
+    this.loadStats();
   }
 
   loadPacientes(): void {
     this.loading = true;
     this.error = null;
-
-    // Simular carga de datos
-    setTimeout(() => {
-      try {
-        // Datos de ejemplo
-        this.pacientes = [
-          {
-            id: 1,
-            nombre: 'María García López',
-            documentoIdentidad: '12345678',
-            sexo: 'F',
-            fechaNacimiento: new Date('1985-03-15'),
-            telefono: '987654321',
-            email: 'maria.garcia@email.com',
-            direccion: 'Av. Principal 123',
-            estado: 'Activo',
-            ultimaConsulta: new Date('2024-01-10')
-          },
-          {
-            id: 2,
-            nombre: 'Juan Pérez Rodríguez',
-            documentoIdentidad: '87654321',
-            sexo: 'M',
-            fechaNacimiento: new Date('1978-07-22'),
-            telefono: '912345678',
-            email: 'juan.perez@email.com',
-            direccion: 'Calle Secundaria 456',
-            estado: 'Activo',
-            ultimaConsulta: new Date('2024-01-08')
-          },
-          {
-            id: 3,
-            nombre: 'Ana López Martínez',
-            documentoIdentidad: '11223344',
-            sexo: 'F',
-            fechaNacimiento: new Date('1992-11-30'),
-            telefono: '998877665',
-            email: 'ana.lopez@email.com',
-            direccion: 'Jr. Los Olivos 789',
-            estado: 'Activo'
-          },
-          {
-            id: 4,
-            nombre: 'Carlos Mendoza Silva',
-            documentoIdentidad: '55667788',
-            sexo: 'M',
-            fechaNacimiento: new Date('1965-05-18'),
-            telefono: '955443322',
-            email: 'carlos.mendoza@email.com',
-            direccion: 'Av. Los Pinos 321',
-            estado: 'Inactivo',
-            ultimaConsulta: new Date('2023-12-15')
-          },
-          {
-            id: 5,
-            nombre: 'Lucía Fernández Torres',
-            documentoIdentidad: '99887766',
-            sexo: 'F',
-            fechaNacimiento: new Date('1988-09-12'),
-            telefono: '966554433',
-            email: 'lucia.fernandez@email.com',
-            direccion: 'Calle Las Flores 654',
-            estado: 'Activo',
-            ultimaConsulta: new Date('2024-01-12')
-          }
-        ];
-
+    
+    this.pacienteService.getPacientesList().subscribe({
+      next: (pacientes) => {
+        this.pacientes = pacientes;
         this.applyFilters();
         this.loading = false;
-      } catch (error) {
-        this.error = 'Error al cargar los pacientes';
+      },
+      error: (error) => {
+        this.error = 'Error al cargar los pacientes. Por favor, inténtalo de nuevo.';
         this.loading = false;
+        console.error('Error loading pacientes:', error);
       }
-    }, 1000);
+    });
+  }
+
+  loadStats(): void {
+    this.pacienteService.getPacientesStats().subscribe({
+      next: (stats) => {
+        this.stats = stats;
+      },
+      error: (error) => {
+        console.error('Error loading stats:', error);
+      }
+    });
   }
 
   onSearch(): void {
@@ -144,34 +133,33 @@ export class PacienteListComponent implements OnInit {
     this.searchTerm = '';
     this.selectedEstado = '';
     this.selectedSexo = '';
+    this.selectedTipoDocumento = '';
+    this.selectedSeguroMedico = '';
+    this.selectedGrupoSanguineo = '';
     this.currentPage = 1;
-    this.applyFilters();
+    this.loadPacientes();
   }
 
   applyFilters(): void {
-    let filtered = [...this.pacientes];
-
-    // Filtro por término de búsqueda
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(p => 
-        p.nombre.toLowerCase().includes(term) ||
-        p.documentoIdentidad.includes(term) ||
-        (p.email && p.email.toLowerCase().includes(term))
-      );
-    }
-
-    // Filtro por estado
-    if (this.selectedEstado) {
-      filtered = filtered.filter(p => p.estado.toLowerCase() === this.selectedEstado);
-    }
-
-    // Filtro por sexo
-    if (this.selectedSexo) {
-      filtered = filtered.filter(p => p.sexo === this.selectedSexo);
-    }
-
-    this.filteredPacientes = filtered;
+    this.filteredPacientes = this.pacientes.filter(paciente => {
+      const matchesSearch = !this.searchTerm || 
+        paciente.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        paciente.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        paciente.numeroDocumento.includes(this.searchTerm) ||
+        (paciente.telefono && paciente.telefono.includes(this.searchTerm)) ||
+        (paciente.email && paciente.email.toLowerCase().includes(this.searchTerm.toLowerCase()));
+      
+      const matchesEstado = !this.selectedEstado || paciente.estado === this.selectedEstado;
+      const matchesSexo = !this.selectedSexo || paciente.sexo === this.selectedSexo;
+      const matchesTipoDocumento = !this.selectedTipoDocumento || paciente.tipoDocumento === this.selectedTipoDocumento;
+      const matchesSeguroMedico = !this.selectedSeguroMedico || 
+        (paciente.seguroMedico && paciente.seguroMedico.tipo === this.selectedSeguroMedico);
+      const matchesGrupoSanguineo = !this.selectedGrupoSanguineo || paciente.grupoSanguineo === this.selectedGrupoSanguineo;
+      
+      return matchesSearch && matchesEstado && matchesSexo && matchesTipoDocumento && 
+             matchesSeguroMedico && matchesGrupoSanguineo;
+    });
+    
     this.updatePagination();
   }
 
@@ -237,19 +225,104 @@ export class PacienteListComponent implements OnInit {
 
   eliminarPaciente(pacienteId: number): void {
     if (confirm('¿Está seguro de que desea eliminar este paciente?')) {
-      console.log('Eliminar paciente:', pacienteId);
-      // Implementar eliminación
+      this.pacienteService.deletePaciente(pacienteId).subscribe({
+        next: () => {
+          this.loadPacientes();
+          this.loadStats();
+        },
+        error: (error) => {
+          this.error = 'Error al eliminar el paciente';
+          console.error('Error deleting paciente:', error);
+        }
+      });
     }
   }
 
-  exportarPacientes(): void {
-    console.log('Exportar pacientes');
-    // Implementar exportación
+  toggleEstado(paciente: Paciente): void {
+    this.pacienteService.togglePacienteEstado(paciente.id).subscribe({
+      next: (updatedPaciente) => {
+        const index = this.pacientes.findIndex(p => p.id === paciente.id);
+        if (index !== -1) {
+          this.pacientes[index] = updatedPaciente;
+          this.applyFilters();
+        }
+        this.loadStats();
+      },
+      error: (error) => {
+        this.error = 'Error al cambiar el estado del paciente';
+        console.error('Error toggling paciente estado:', error);
+      }
+    });
   }
 
-  importarPacientes(): void {
-    console.log('Importar pacientes');
-    // Implementar importación
+  exportarPacientes(): void {
+    this.exporting = true;
+    
+    this.pacienteService.exportPacientes('excel').subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `pacientes_${new Date().toISOString().split('T')[0]}.xlsx`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.exporting = false;
+      },
+      error: (error) => {
+        this.error = 'Error al exportar los pacientes';
+        this.exporting = false;
+        console.error('Error exporting pacientes:', error);
+      }
+    });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.importarPacientes(file);
+    }
+  }
+
+  importarPacientes(file?: File): void {
+    if (!file) {
+      console.log('Importar pacientes');
+      return;
+    }
+    
+    this.importing = true;
+    this.pacienteService.importPacientes(file).subscribe({
+      next: (result) => {
+        alert(`Importación completada: ${result.exitosos} pacientes importados, ${result.errores} errores`);
+        this.loadPacientes();
+        this.loadStats();
+        this.importing = false;
+      },
+      error: (error) => {
+        this.error = 'Error al importar los pacientes';
+        this.importing = false;
+        console.error('Error importing pacientes:', error);
+      }
+    });
+  }
+
+  searchPacientes(): void {
+    if (this.searchTerm.trim()) {
+      this.loading = true;
+      this.pacienteService.searchPacientes(this.searchTerm).subscribe({
+        next: (pacientes) => {
+          this.pacientes = pacientes;
+          this.applyFilters();
+          this.loading = false;
+        },
+        error: (error) => {
+          this.error = 'Error en la búsqueda';
+          this.loading = false;
+          console.error('Error searching pacientes:', error);
+        }
+      });
+    } else {
+      this.loadPacientes();
+    }
   }
 
   generarReporte(): void {

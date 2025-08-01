@@ -1,0 +1,562 @@
+.examenes-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+}
+
+.page-header {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    i {
+      color: #ddd6fe;
+    }
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+  }
+
+  .btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.filters-section {
+  padding: 0 1rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.filters-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.search-group {
+  position: relative;
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    z-index: 2;
+  }
+
+  .search-input {
+    padding-left: 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+  }
+}
+
+.form-select {
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+}
+
+.results-info {
+  padding: 0 1rem;
+  max-width: 1200px;
+  margin: 0 auto 1rem;
+
+  .results-count {
+    color: #6b7280;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+
+  .loading-spinner {
+    text-align: center;
+    color: white;
+
+    i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #8b5cf6;
+    }
+
+    p {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+  }
+}
+
+.examenes-grid {
+  padding: 0 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.examen-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  &.urgent {
+    border-left: 5px solid #ef4444;
+    
+    .card-header {
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    }
+  }
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  .examen-info {
+    .examen-id {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+
+      i {
+        color: #8b5cf6;
+      }
+    }
+
+    .examen-date {
+      font-size: 0.875rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+
+      i {
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .examen-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+}
+
+.badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+
+  &.badge-warning {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: white;
+  }
+
+  &.badge-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+  }
+
+  &.badge-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+  }
+
+  &.badge-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  &.badge-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+  }
+
+  &.badge-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+  }
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.patient-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+
+  .patient-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+
+    i {
+      color: #8b5cf6;
+    }
+  }
+
+  .patient-details {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .patient-doc, .patient-contact {
+      font-size: 0.875rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+
+      i {
+        color: #94a3b8;
+      }
+    }
+  }
+}
+
+.exam-details {
+  margin-bottom: 1rem;
+
+  > div {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    strong {
+      color: #374151;
+      font-weight: 600;
+      min-width: 100px;
+      font-size: 0.875rem;
+    }
+
+    span {
+      color: #6b7280;
+      font-size: 0.875rem;
+      flex: 1;
+    }
+  }
+
+  .category-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+
+    &.category-laboratorio {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      color: #1e40af;
+    }
+
+    &.category-imagen {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      color: #065f46;
+    }
+
+    &.category-especializado {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+    }
+  }
+}
+
+.scheduled-info {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #0c4a6e;
+  display: flex;
+  align-items: center;
+
+  i {
+    color: #0284c7;
+  }
+}
+
+.results-info-card {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: #065f46;
+    font-size: 0.875rem;
+
+    i {
+      color: #10b981;
+    }
+
+    .result-date {
+      font-size: 0.75rem;
+      color: #047857;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: 20px;
+    }
+  }
+
+  .results-preview {
+    font-size: 0.875rem;
+    color: #047857;
+    line-height: 1.4;
+  }
+}
+
+.card-actions {
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border-width: 2px;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      &.btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+
+  .empty-content {
+    text-align: center;
+    color: white;
+    max-width: 400px;
+
+    .empty-icon {
+      font-size: 4rem;
+      color: #8b5cf6;
+      margin-bottom: 1.5rem;
+      opacity: 0.7;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    .btn {
+      border-radius: 50px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+
+    .btn-link {
+      color: #ddd6fe;
+      text-decoration: underline;
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .page-header {
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+    }
+  }
+
+  .filters-card {
+    padding: 1rem;
+  }
+
+  .examenes-grid {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem 1rem;
+  }
+
+  .examen-card {
+    .card-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+
+      .examen-badges {
+        align-items: flex-start;
+        flex-direction: row;
+        gap: 0.5rem;
+      }
+    }
+
+    .patient-details {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .exam-details > div {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+
+      strong {
+        min-width: auto;
+      }
+    }
+  }
+
+  .action-buttons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .filters-section {
+    padding: 0 0.5rem;
+  }
+
+  .results-info {
+    padding: 0 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-actions {
+    padding: 0.75rem 1rem;
+  }
+
+  .action-buttons {
+    .btn {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}

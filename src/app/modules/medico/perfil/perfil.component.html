@@ -1,0 +1,591 @@
+<div class="perfil-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">
+          <i class="fas fa-user-md me-3"></i>
+          Mi Perfil Profesional
+        </h1>
+        <p class="page-subtitle">Gestiona tu información personal y profesional</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline-light" (click)="downloadProfile()">
+          <i class="fas fa-download me-2"></i>
+          Descargar CV
+        </button>
+        <button 
+          class="btn btn-light"
+          (click)="toggleEditMode()"
+          [disabled]="loading">
+          <i [class]="editMode ? 'fas fa-times' : 'fas fa-edit'" class="me-2"></i>
+          {{ editMode ? 'Cancelar' : 'Editar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading && !medico" class="loading-container">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Cargando perfil...</p>
+    </div>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="medico" class="profile-content">
+    
+    <!-- Profile Summary Card -->
+    <div class="profile-summary">
+      <div class="profile-avatar">
+        <div class="avatar-circle">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <div class="verification-badge" *ngIf="medico.verificado">
+          <i class="fas fa-check-circle" title="Perfil Verificado"></i>
+        </div>
+      </div>
+      <div class="profile-info">
+        <h2 class="profile-name">{{ medico.nombres }} {{ medico.apellidos }}</h2>
+        <div class="profile-details">
+          <div class="detail-item">
+            <i class="fas fa-id-card me-2"></i>
+            <span>{{ medico.tipoDocumento }}: {{ medico.documento }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span>{{ medico.numeroColegiatura }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-calendar me-2"></i>
+            <span>{{ medico.experienciaAnos }} años de experiencia</span>
+          </div>
+        </div>
+        <div class="profile-status">
+          <span class="badge" [class]="getEstadoClass(medico.estado)">
+            <i [class]="getEstadoIcon(medico.estado)" class="me-1"></i>
+            {{ medico.estado | titlecase }}
+          </span>
+          <span class="badge badge-info" *ngIf="medico.tipoMedico === 'independiente'">
+            <i class="fas fa-user-tie me-1"></i>
+            Médico Independiente
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="profile-tabs">
+      <button 
+        class="tab-button"
+        [class.active]="activeTab === 'personal'"
+        (click)="setActiveTab('personal')">
+        <i class="fas fa-user me-2"></i>
+        Información Personal
+      </button>
+      <button 
+        class="tab-button"
+        [class.active]="activeTab === 'profesional'"
+        (click)="setActiveTab('profesional')">
+        <i class="fas fa-stethoscope me-2"></i>
+        Información Profesional
+      </button>
+      <button 
+        class="tab-button"
+        [class.active]="activeTab === 'configuracion'"
+        (click)="setActiveTab('configuracion')">
+        <i class="fas fa-cog me-2"></i>
+        Configuración
+      </button>
+    </div>
+
+    <!-- Form Content -->
+    <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="profile-form">
+      
+      <!-- Personal Information Tab -->
+      <div *ngIf="activeTab === 'personal'" class="tab-content">
+        <div class="form-card">
+          <div class="form-section-header">
+            <h4>
+              <i class="fas fa-user me-2"></i>
+              Datos Personales
+            </h4>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label required">
+                <i class="fas fa-user me-2"></i>
+                Nombres
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="nombres"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('nombres')">
+              <div *ngIf="isFieldInvalid('nombres')" class="invalid-feedback">
+                {{ getFieldError('nombres') }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label required">
+                <i class="fas fa-user me-2"></i>
+                Apellidos
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="apellidos"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('apellidos')">
+              <div *ngIf="isFieldInvalid('apellidos')" class="invalid-feedback">
+                {{ getFieldError('apellidos') }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">
+                <i class="fas fa-id-card me-2"></i>
+                Tipo de Documento
+              </label>
+              <select 
+                class="form-select"
+                formControlName="tipoDocumento"
+                [disabled]="!editMode"
+                [class.is-invalid]="isFieldInvalid('tipoDocumento')">
+                <option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">
+                  {{ tipo.label }}
+                </option>
+              </select>
+              <div *ngIf="isFieldInvalid('tipoDocumento')" class="invalid-feedback">
+                {{ getFieldError('tipoDocumento') }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">
+                <i class="fas fa-id-card me-2"></i>
+                Número de Documento
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="documento"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('documento')">
+              <div *ngIf="isFieldInvalid('documento')" class="invalid-feedback">
+                {{ getFieldError('documento') }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">
+                <i class="fas fa-venus-mars me-2"></i>
+                Género
+              </label>
+              <select 
+                class="form-select"
+                formControlName="genero"
+                [disabled]="!editMode"
+                [class.is-invalid]="isFieldInvalid('genero')">
+                <option value="">Seleccionar género</option>
+                <option *ngFor="let genero of generos" [value]="genero.value">
+                  {{ genero.label }}
+                </option>
+              </select>
+              <div *ngIf="isFieldInvalid('genero')" class="invalid-feedback">
+                {{ getFieldError('genero') }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label required">
+                <i class="fas fa-birthday-cake me-2"></i>
+                Fecha de Nacimiento
+              </label>
+              <input 
+                type="date" 
+                class="form-control"
+                formControlName="fechaNacimiento"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('fechaNacimiento')">
+              <div *ngIf="isFieldInvalid('fechaNacimiento')" class="invalid-feedback">
+                {{ getFieldError('fechaNacimiento') }}
+              </div>
+              <div *ngIf="medico.fechaNacimiento" class="form-text">
+                Edad: {{ calculateAge(medico.fechaNacimiento) }} años
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label required">
+                <i class="fas fa-phone me-2"></i>
+                Teléfono
+              </label>
+              <input 
+                type="tel" 
+                class="form-control"
+                formControlName="telefono"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('telefono')">
+              <div *ngIf="isFieldInvalid('telefono')" class="invalid-feedback">
+                {{ getFieldError('telefono') }}
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label required">
+                <i class="fas fa-envelope me-2"></i>
+                Email
+              </label>
+              <input 
+                type="email" 
+                class="form-control"
+                formControlName="email"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('email')">
+              <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+                {{ getFieldError('email') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Section -->
+          <div class="form-section-header">
+            <h4>
+              <i class="fas fa-map-marker-alt me-2"></i>
+              Dirección
+            </h4>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label required">
+                <i class="fas fa-home me-2"></i>
+                Dirección Completa
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="direccion"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('direccion')">
+              <div *ngIf="isFieldInvalid('direccion')" class="invalid-feedback">
+                {{ getFieldError('direccion') }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">
+                <i class="fas fa-map me-2"></i>
+                Distrito
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="distrito"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('distrito')">
+              <div *ngIf="isFieldInvalid('distrito')" class="invalid-feedback">
+                {{ getFieldError('distrito') }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">
+                <i class="fas fa-map me-2"></i>
+                Provincia
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="provincia"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('provincia')">
+              <div *ngIf="isFieldInvalid('provincia')" class="invalid-feedback">
+                {{ getFieldError('provincia') }}
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">
+                <i class="fas fa-map me-2"></i>
+                Departamento
+              </label>
+              <select 
+                class="form-select"
+                formControlName="departamento"
+                [disabled]="!editMode"
+                [class.is-invalid]="isFieldInvalid('departamento')">
+                <option value="">Seleccionar departamento</option>
+                <option *ngFor="let dept of departamentos" [value]="dept">
+                  {{ dept }}
+                </option>
+              </select>
+              <div *ngIf="isFieldInvalid('departamento')" class="invalid-feedback">
+                {{ getFieldError('departamento') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Professional Information Tab -->
+      <div *ngIf="activeTab === 'profesional'" class="tab-content">
+        <div class="form-card">
+          <div class="form-section-header">
+            <h4>
+              <i class="fas fa-graduation-cap me-2"></i>
+              Información Profesional
+            </h4>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label required">
+                <i class="fas fa-university me-2"></i>
+                Colegio Profesional
+              </label>
+              <select 
+                class="form-select"
+                formControlName="colegioProfesional"
+                [disabled]="!editMode"
+                [class.is-invalid]="isFieldInvalid('colegioProfesional')">
+                <option value="">Seleccionar colegio</option>
+                <option *ngFor="let colegio of colegiosProfesionales" [value]="colegio">
+                  {{ colegio }}
+                </option>
+              </select>
+              <div *ngIf="isFieldInvalid('colegioProfesional')" class="invalid-feedback">
+                {{ getFieldError('colegioProfesional') }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label required">
+                <i class="fas fa-id-badge me-2"></i>
+                Número de Colegiatura
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="numeroColegiatura"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('numeroColegiatura')">
+              <div *ngIf="isFieldInvalid('numeroColegiatura')" class="invalid-feedback">
+                {{ getFieldError('numeroColegiatura') }}
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label required">
+                <i class="fas fa-stethoscope me-2"></i>
+                Especialidades
+              </label>
+              <select 
+                class="form-select"
+                formControlName="especialidades"
+                multiple
+                size="4"
+                [disabled]="!editMode"
+                [class.is-invalid]="isFieldInvalid('especialidades')"
+                (change)="onEspecialidadChange($event)">
+                <option *ngFor="let esp of especialidades" [value]="esp.id">
+                  {{ esp.nombre }} ({{ esp.categoria }})
+                </option>
+              </select>
+              <div *ngIf="isFieldInvalid('especialidades')" class="invalid-feedback">
+                {{ getFieldError('especialidades') }}
+              </div>
+              <div class="form-text">
+                Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples especialidades
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">
+                <i class="fas fa-plus-circle me-2"></i>
+                Subespecialidades
+              </label>
+              <select 
+                class="form-select"
+                formControlName="subespecialidades"
+                multiple
+                size="3"
+                [disabled]="!editMode"
+                (change)="onSubespecialidadChange($event)">
+                <option *ngFor="let esp of especialidades" [value]="esp.id">
+                  {{ esp.nombre }}
+                </option>
+              </select>
+              <div class="form-text">
+                Subespecialidades o certificaciones adicionales
+              </div>
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label required">
+                <i class="fas fa-university me-2"></i>
+                Universidad de Título
+              </label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="universidadTitulo"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('universidadTitulo')">
+              <div *ngIf="isFieldInvalid('universidadTitulo')" class="invalid-feedback">
+                {{ getFieldError('universidadTitulo') }}
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label required">
+                <i class="fas fa-calendar me-2"></i>
+                Año de Titulación
+              </label>
+              <input 
+                type="number" 
+                class="form-control"
+                formControlName="anoTitulacion"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('anoTitulacion')">
+              <div *ngIf="isFieldInvalid('anoTitulacion')" class="invalid-feedback">
+                {{ getFieldError('anoTitulacion') }}
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label required">
+                <i class="fas fa-clock me-2"></i>
+                Años de Experiencia
+              </label>
+              <input 
+                type="number" 
+                class="form-control"
+                formControlName="experienciaAnos"
+                [readonly]="!editMode"
+                [class.is-invalid]="isFieldInvalid('experienciaAnos')">
+              <div *ngIf="isFieldInvalid('experienciaAnos')" class="invalid-feedback">
+                {{ getFieldError('experienciaAnos') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Specialties Display -->
+          <div *ngIf="medico.especialidades.length > 0" class="specialties-display">
+            <h6>
+              <i class="fas fa-star me-2"></i>
+              Especialidades Actuales
+            </h6>
+            <div class="specialty-badges">
+              <span 
+                *ngFor="let espId of medico.especialidades" 
+                class="badge badge-primary specialty-badge">
+                <i class="fas fa-stethoscope me-1"></i>
+                {{ getEspecialidadNombre(espId) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration Tab -->
+      <div *ngIf="activeTab === 'configuracion'" class="tab-content">
+        <div class="form-card">
+          <div class="form-section-header">
+            <h4>
+              <i class="fas fa-cog me-2"></i>
+              Configuración de Cuenta
+            </h4>
+          </div>
+
+          <div class="config-section">
+            <div class="config-item">
+              <div class="config-info">
+                <h6>
+                  <i class="fas fa-key me-2"></i>
+                  Cambiar Contraseña
+                </h6>
+                <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
+              </div>
+              <button class="btn btn-outline-primary" (click)="navigateToChangePassword()">
+                <i class="fas fa-edit me-2"></i>
+                Cambiar
+              </button>
+            </div>
+
+            <div class="config-item">
+              <div class="config-info">
+                <h6>
+                  <i class="fas fa-shield-alt me-2"></i>
+                  Configuración de Seguridad
+                </h6>
+                <p>Gestiona la autenticación de dos factores y otras opciones de seguridad</p>
+              </div>
+              <button class="btn btn-outline-primary" (click)="navigateToSecurity()">
+                <i class="fas fa-cog me-2"></i>
+                Configurar
+              </button>
+            </div>
+
+            <div class="config-item">
+              <div class="config-info">
+                <h6>
+                  <i class="fas fa-info-circle me-2"></i>
+                  Información de Cuenta
+                </h6>
+                <div class="account-details">
+                  <div class="detail-row">
+                    <span class="label">Fecha de registro:</span>
+                    <span class="value">{{ formatDate(medico.fechaRegistro) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Última actualización:</span>
+                    <span class="value">{{ formatDate(medico.ultimaActualizacion) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Estado de verificación:</span>
+                    <span class="value">
+                      <span class="badge" [class]="medico.verificado ? 'badge-success' : 'badge-warning'">
+                        <i [class]="medico.verificado ? 'fas fa-check-circle' : 'fas fa-clock'" class="me-1"></i>
+                        {{ medico.verificado ? 'Verificado' : 'Pendiente' }}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div *ngIf="editMode" class="form-actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleEditMode()">
+          <i class="fas fa-times me-2"></i>
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="perfilForm.invalid || loading">
+          <i *ngIf="loading" class="fas fa-spinner fa-spin me-2"></i>
+          <i *ngIf="!loading" class="fas fa-save me-2"></i>
+          {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div *ngIf="showSuccess" class="success-toast">
+  <div class="toast-content">
+    <i class="fas fa-check-circle"></i>
+    <span>Perfil actualizado exitosamente</span>
+  </div>
+</div>

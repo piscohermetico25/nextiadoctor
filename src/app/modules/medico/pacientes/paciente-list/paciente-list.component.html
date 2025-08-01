@@ -13,24 +13,139 @@
 
 <div class="pacientes-container">
 
+  <!-- Statistics Section -->
+  <div *ngIf="stats" class="stats-section mb-4">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="stat-card stat-primary">
+          <div class="stat-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.total }}</h3>
+            <p>Total Pacientes</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card stat-success">
+          <div class="stat-icon">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.activos }}</h3>
+            <p>Pacientes Activos</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card stat-warning">
+          <div class="stat-icon">
+            <i class="bi bi-calendar-plus"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.nuevosEsteMes }}</h3>
+            <p>Nuevos este Mes</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card stat-info">
+          <div class="stat-icon">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.consultasHoy }}</h3>
+            <p>Consultas Hoy</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Filters Section -->
   <div class="filters-section">
     <div class="filters-card">
-      <div class="row align-items-center g-3">
-        <div class="col-md-4">
+      <div class="row align-items-end g-3">
+        <div class="col-md-2">
           <div class="filter-group">
-            <label class="filter-label">Filtrar por sexo</label>
+            <label class="filter-label">Estado</label>
             <select 
               class="form-select form-select-modern" 
-              [(ngModel)]="selectedSexo"
-              (change)="onFilterChange()"
+              [(ngModel)]="selectedEstado"
+              (change)="applyFilters()"
             >
-              <option value="">👥 Todos los sexos</option>
-              <option value="M">👨 Masculino</option>
-              <option value="F">👩 Femenino</option>
+              <option value="">Todos</option>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
             </select>
           </div>
         </div>
+        <div class="col-md-2">
+          <div class="filter-group">
+            <label class="filter-label">Sexo</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="selectedSexo"
+              (change)="applyFilters()"
+            >
+              <option value="">Todos</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="filter-group">
+            <label class="filter-label">Tipo Documento</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="selectedTipoDocumento"
+              (change)="applyFilters()"
+            >
+              <option value="">Todos</option>
+              <option *ngFor="let tipo of tipoDocumentoOptions" [value]="tipo">{{ tipo }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="filter-group">
+            <label class="filter-label">Seguro Médico</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="selectedSeguroMedico"
+              (change)="applyFilters()"
+            >
+              <option value="">Todos</option>
+              <option *ngFor="let seguro of seguroMedicoOptions" [value]="seguro">{{ seguro }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="filter-group">
+            <label class="filter-label">Grupo Sanguíneo</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="selectedGrupoSanguineo"
+              (change)="applyFilters()"
+            >
+              <option value="">Todos</option>
+              <option *ngFor="let grupo of grupoSanguineoOptions" [value]="grupo">{{ grupo }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="filter-group">
+            <button class="btn btn-clear-filters w-100" (click)="clearFilters()">
+              <i class="bi bi-arrow-clockwise me-2"></i>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Search and Actions Row -->
+      <div class="row align-items-center g-3 mt-2">
         <div class="col-md-6">
           <div class="filter-group">
             <label class="filter-label">Buscar pacientes</label>
@@ -39,20 +154,48 @@
               <input 
                 type="text" 
                 class="form-control search-input" 
-                placeholder="Buscar por nombre, DNI, teléfono..."
+                placeholder="Buscar por nombre, apellidos, DNI, teléfono, email..."
                 [(ngModel)]="searchTerm"
-                (input)="onSearch()"
+                (keyup.enter)="searchPacientes()"
+                (input)="applyFilters()"
               >
             </div>
           </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-6">
           <div class="filter-group">
-            <label class="filter-label">&nbsp;</label>
-            <button class="btn btn-clear-filters" (click)="clearFilters()">
-              <i class="bi bi-arrow-clockwise me-2"></i>
-              Limpiar
-            </button>
+            <label class="filter-label">Acciones</label>
+            <div class="d-flex gap-2">
+              <button 
+                class="btn btn-outline-success" 
+                (click)="exportarPacientes()"
+                [disabled]="exporting"
+                title="Exportar pacientes"
+              >
+                <i class="bi bi-download me-2"></i>
+                <span *ngIf="!exporting">Exportar</span>
+                <span *ngIf="exporting">Exportando...</span>
+              </button>
+              <div class="position-relative">
+                <input 
+                  type="file" 
+                  #fileInput 
+                  (change)="onFileSelected($event)" 
+                  accept=".xlsx,.xls,.csv"
+                  class="d-none"
+                >
+                <button 
+                  class="btn btn-outline-primary" 
+                  (click)="fileInput.click()"
+                  [disabled]="importing"
+                  title="Importar pacientes"
+                >
+                  <i class="bi bi-upload me-2"></i>
+                  <span *ngIf="!importing">Importar</span>
+                  <span *ngIf="importing">Importando...</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -99,15 +242,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let paciente of filteredPacientes" class="patient-row">
+            <tr *ngFor="let paciente of paginatedPacientes" class="patient-row">
               <td class="td-patient">
                 <div class="patient-info">
                   <div class="patient-avatar">
-                    {{ paciente.nombres.charAt(0) }}{{ paciente.apellidos.charAt(0) }}
+                    {{ paciente.nombre.charAt(0) }}{{ paciente.apellidos.charAt(0) }}
                   </div>
                   <div class="patient-details">
-                    <div class="patient-name">{{ paciente.nombres }} {{ paciente.apellidos }}</div>
-                    <div class="patient-document">{{ paciente.numero_documento }}</div>
+                    <div class="patient-name">{{ paciente.nombre }} {{ paciente.apellidos }}</div>
+                    <div class="patient-document">{{ paciente.tipoDocumento }}: {{ paciente.numeroDocumento }}</div>
                     <div *ngIf="paciente.telefono" class="patient-phone">
                       <i class="bi bi-telephone me-1"></i>{{ paciente.telefono }}
                     </div>
@@ -118,7 +261,7 @@
                 <div class="info-details">
                   <div class="info-item">
                     <i class="bi bi-calendar3 me-2"></i>
-                    {{ calcularEdad(paciente.fecha_nacimiento) }} años
+                    {{ calcularEdad(paciente.fechaNacimiento) }} años
                   </div>
                   <div class="info-item">
                     <i class="bi bi-gender-{{ paciente.sexo.toLowerCase() }} me-2"></i>
@@ -128,18 +271,34 @@
                     <i class="bi bi-envelope me-2"></i>
                     {{ paciente.email }}
                   </div>
+                  <div class="info-item" *ngIf="paciente.grupoSanguineo">
+                    <i class="bi bi-droplet me-2"></i>
+                    {{ paciente.grupoSanguineo }}
+                  </div>
                 </div>
               </td>
               <td class="td-status">
-                <span class="status-badge" [ngClass]="paciente.activo ? 'status-active' : 'status-inactive'">
-                  <i class="bi" [ngClass]="paciente.activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
-                  {{ paciente.activo ? 'Activo' : 'Inactivo' }}
-                </span>
+                <div class="d-flex flex-column gap-1">
+                  <span class="status-badge" [ngClass]="paciente.estado === 'Activo' ? 'status-active' : 'status-inactive'">
+                    <i class="bi" [ngClass]="paciente.estado === 'Activo' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    {{ paciente.estado }}
+                  </span>
+                  <button 
+                    class="btn btn-sm btn-outline-secondary" 
+                    (click)="toggleEstado(paciente)"
+                    title="Cambiar estado"
+                  >
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                </div>
               </td>
               <td class="td-date">
                 <div class="date-info">
-                  <div class="date-primary">{{ paciente.fecha_creacion | date:'dd/MM/yyyy' }}</div>
-                  <div class="date-secondary">{{ paciente.fecha_creacion | date:'HH:mm' }}</div>
+                  <div class="date-primary">{{ paciente.fechaCreacion | date:'dd/MM/yyyy' }}</div>
+                  <div class="date-secondary">{{ paciente.fechaCreacion | date:'HH:mm' }}</div>
+                  <div *ngIf="paciente.ultimaConsulta" class="date-last-visit">
+                    <small class="text-muted">Última: {{ paciente.ultimaConsulta | date:'dd/MM/yyyy' }}</small>
+                  </div>
                 </div>
               </td>
               <td class="td-actions">
@@ -185,6 +344,49 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Pagination -->
+      <div class="pagination-container" *ngIf="filteredPacientes.length > itemsPerPage">
+        <nav aria-label="Paginación de pacientes">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+            </li>
+            <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+              <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <div class="pagination-info text-center mt-2">
+          <small class="text-muted">
+            Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - 
+            {{ Math.min(currentPage * itemsPerPage, filteredPacientes.length) }} 
+            de {{ filteredPacientes.length }} pacientes
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && filteredPacientes.length === 0" class="empty-state">
+    <div class="empty-state-card">
+      <div class="empty-state-icon">
+        <i class="bi bi-people"></i>
+      </div>
+      <h4>No se encontraron pacientes</h4>
+      <p class="text-muted">No hay pacientes que coincidan con los filtros aplicados.</p>
+      <button class="btn btn-primary" (click)="clearFilters()">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Limpiar filtros
+      </button>
     </div>
   </div>
 </div>
