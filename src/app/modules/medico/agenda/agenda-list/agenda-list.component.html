@@ -1,0 +1,302 @@
+<div class="agenda-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <i class="fas fa-calendar-alt me-2"></i>
+      Mi Agenda Médica
+    </h1>
+    <p>Gestiona tus horarios de atención y disponibilidad</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <span class="loading-text">Cargando agenda...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <i class="fas fa-exclamation-triangle error-icon"></i>
+    <span class="error-message">{{ error }}</span>
+  </div>
+
+  <!-- Filters and Actions -->
+  <div *ngIf="!loading" class="filters-card card">
+    <div class="card-header">
+      <h5><i class="fas fa-filter me-2"></i>Filtros y Acciones</h5>
+    </div>
+    <div class="card-body">
+      <div class="row align-items-end">
+        <!-- Fecha Inicio -->
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="fechaInicio">Fecha Inicio</label>
+            <input
+              type="date"
+              id="fechaInicio"
+              class="form-control"
+              [(ngModel)]="filtros.fechaInicio"
+              (change)="onFilterChange()"
+            >
+          </div>
+        </div>
+
+        <!-- Fecha Fin -->
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="fechaFin">Fecha Fin</label>
+            <input
+              type="date"
+              id="fechaFin"
+              class="form-control"
+              [(ngModel)]="filtros.fechaFin"
+              (change)="onFilterChange()"
+            >
+          </div>
+        </div>
+
+        <!-- Especialidad -->
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="especialidad">Especialidad</label>
+            <select
+              id="especialidad"
+              class="form-control"
+              [(ngModel)]="filtros.especialidadId"
+              (change)="onFilterChange()"
+            >
+              <option value="">Todas las especialidades</option>
+              <option *ngFor="let esp of especialidades" [value]="esp.id">{{ esp.nombre }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="col-md-3">
+          <div class="btn-group w-100">
+            <button type="button" class="btn btn-primary" (click)="nuevoHorario()">
+              <i class="fas fa-plus me-2"></i>
+              Nuevo Horario
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+              <i class="fas fa-eraser me-2"></i>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de Calendario -->
+  <div *ngIf="!loading && vistaActual === 'calendario'" class="calendar-card card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5><i class="fas fa-calendar me-2"></i>Vista de Calendario</h5>
+      <div class="view-controls">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="cambiarVista('lista')">
+          <i class="fas fa-list me-2"></i>
+          Vista Lista
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Navegación del calendario -->
+      <div class="calendar-navigation">
+        <button type="button" class="btn btn-outline-secondary" (click)="mesAnterior()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <h4 class="current-month">{{ mesActual | date:'MMMM yyyy' | titlecase }}</h4>
+        <button type="button" class="btn btn-outline-secondary" (click)="mesSiguiente()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- Calendario -->
+      <div class="calendar-grid">
+        <!-- Días de la semana -->
+        <div class="calendar-header">
+          <div class="day-header" *ngFor="let dia of diasSemana">{{ dia }}</div>
+        </div>
+        
+        <!-- Días del mes -->
+        <div class="calendar-body">
+          <div 
+            class="calendar-day" 
+            *ngFor="let dia of diasMes"
+            [class.other-month]="!dia.esDelMes"
+            [class.today]="dia.esHoy"
+            [class.has-schedule]="dia.tieneHorarios"
+            (click)="seleccionarDia(dia)"
+          >
+            <div class="day-number">{{ dia.numero }}</div>
+            <div class="day-schedules" *ngIf="dia.horarios && dia.horarios.length > 0">
+              <div 
+                class="schedule-item" 
+                *ngFor="let horario of dia.horarios.slice(0, 2)"
+                [class]="'schedule-' + horario.tipo.toLowerCase()"
+              >
+                {{ horario.horaInicio }} - {{ horario.horaFin }}
+              </div>
+              <div *ngIf="dia.horarios.length > 2" class="more-schedules">
+                +{{ dia.horarios.length - 2 }} más
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de Lista -->
+  <div *ngIf="!loading && vistaActual === 'lista'" class="list-card card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5><i class="fas fa-list me-2"></i>Lista de Horarios</h5>
+      <div class="view-controls">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="cambiarVista('calendario')">
+          <i class="fas fa-calendar me-2"></i>
+          Vista Calendario
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Tabla de horarios -->
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Día</th>
+              <th>Horario</th>
+              <th>Especialidad</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Citas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let horario of horariosLista" [class.table-warning]="horario.estado === 'Pendiente'">
+              <td>
+                <div class="date-info">
+                  <div class="date-day">{{ horario.fecha | date:'dd' }}</div>
+                  <div class="date-month">{{ horario.fecha | date:'MMM' | uppercase }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="day-name">{{ horario.fecha | date:'EEEE' | titlecase }}</span>
+              </td>
+              <td>
+                <div class="time-range">
+                  <i class="fas fa-clock me-2"></i>
+                  {{ horario.horaInicio }} - {{ horario.horaFin }}
+                </div>
+                <div class="duration">{{ calcularDuracion(horario.horaInicio, horario.horaFin) }}</div>
+              </td>
+              <td>
+                <span class="specialty-badge">{{ horario.especialidad }}</span>
+              </td>
+              <td>
+                <span class="badge" [class]="'badge-' + horario.tipo.toLowerCase()">{{ horario.tipo }}</span>
+              </td>
+              <td>
+                <span class="badge" [class]="'badge-status-' + horario.estado.toLowerCase()">{{ horario.estado }}</span>
+              </td>
+              <td>
+                <div class="appointments-info">
+                  <span class="appointments-count">{{ horario.citasReservadas }}/{{ horario.citasDisponibles }}</span>
+                  <div class="progress mt-1">
+                    <div 
+                      class="progress-bar" 
+                      [style.width.%]="(horario.citasReservadas / horario.citasDisponibles) * 100"
+                      [class]="getProgressBarClass(horario.citasReservadas, horario.citasDisponibles)"
+                    ></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-primary" 
+                    (click)="editarHorario(horario.id)"
+                    title="Editar horario"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-info" 
+                    (click)="verCitas(horario.id)"
+                    title="Ver citas"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-warning" 
+                    (click)="duplicarHorario(horario.id)"
+                    title="Duplicar horario"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-danger" 
+                    (click)="eliminarHorario(horario.id)"
+                    title="Eliminar horario"
+                    [disabled]="horario.citasReservadas > 0"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="horariosLista.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-calendar-times"></i>
+        </div>
+        <div class="empty-title">No hay horarios programados</div>
+        <div class="empty-message">Comienza creando tu primer horario de atención</div>
+        <button type="button" class="btn btn-primary" (click)="nuevoHorario()">
+          <i class="fas fa-plus me-2"></i>
+          Crear Primer Horario
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div *ngIf="!loading && horariosLista.length > 0 && vistaActual === 'lista'" class="pagination-container">
+    <div class="pagination-info">
+      Mostrando {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} horarios
+    </div>
+    <nav>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="goToPage(currentPage - 1)" href="javascript:void(0)">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+        <li 
+          class="page-item" 
+          *ngFor="let page of getPageNumbers()" 
+          [class.active]="page === currentPage"
+        >
+          <a class="page-link" (click)="goToPage(page)" href="javascript:void(0)">{{ page }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="goToPage(currentPage + 1)" href="javascript:void(0)">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

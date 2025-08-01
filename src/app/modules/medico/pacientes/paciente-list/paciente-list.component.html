@@ -1,0 +1,190 @@
+<app-page-header
+  title="Gestión de Pacientes"
+  subtitle="Administra y supervisa todos los pacientes registrados en el sistema médico"
+  icon="bi bi-people-fill"
+  actionType="button"
+  actionText="Nuevo Paciente"
+  actionRoute="/medico/pacientes/nuevo"
+  actionIcon="bi bi-person-plus-fill"
+  primaryColor="#28a745"
+  secondaryColor="#1e7e34"
+  [showAction]="true">
+</app-page-header>
+
+<div class="pacientes-container">
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <div class="row align-items-center g-3">
+        <div class="col-md-4">
+          <div class="filter-group">
+            <label class="filter-label">Filtrar por sexo</label>
+            <select 
+              class="form-select form-select-modern" 
+              [(ngModel)]="selectedSexo"
+              (change)="onFilterChange()"
+            >
+              <option value="">👥 Todos los sexos</option>
+              <option value="M">👨 Masculino</option>
+              <option value="F">👩 Femenino</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="filter-group">
+            <label class="filter-label">Buscar pacientes</label>
+            <div class="search-input-group">
+              <i class="bi bi-search search-icon"></i>
+              <input 
+                type="text" 
+                class="form-control search-input" 
+                placeholder="Buscar por nombre, DNI, teléfono..."
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="filter-group">
+            <label class="filter-label">&nbsp;</label>
+            <button class="btn btn-clear-filters" (click)="clearFilters()">
+              <i class="bi bi-arrow-clockwise me-2"></i>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-card">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <h5>Cargando pacientes...</h5>
+      <p class="text-muted">Por favor espera mientras obtenemos la información</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger alert-modern">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+      <div class="flex-grow-1">
+        <h6 class="mb-1">Error al cargar los pacientes</h6>
+        <p class="mb-0">{{ error }}</p>
+      </div>
+      <button class="btn btn-outline-danger" (click)="loadPacientes()">
+        <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Patients Table -->
+  <div *ngIf="!loading && !error && filteredPacientes.length > 0" class="patients-table-container">
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="table table-modern">
+          <thead>
+            <tr>
+              <th class="th-patient">Paciente</th>
+              <th class="th-info">Información</th>
+              <th class="th-status">Estado</th>
+              <th class="th-date">Fecha Registro</th>
+              <th class="th-actions">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let paciente of filteredPacientes" class="patient-row">
+              <td class="td-patient">
+                <div class="patient-info">
+                  <div class="patient-avatar">
+                    {{ paciente.nombres.charAt(0) }}{{ paciente.apellidos.charAt(0) }}
+                  </div>
+                  <div class="patient-details">
+                    <div class="patient-name">{{ paciente.nombres }} {{ paciente.apellidos }}</div>
+                    <div class="patient-document">{{ paciente.numero_documento }}</div>
+                    <div *ngIf="paciente.telefono" class="patient-phone">
+                      <i class="bi bi-telephone me-1"></i>{{ paciente.telefono }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="td-info">
+                <div class="info-details">
+                  <div class="info-item">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    {{ calcularEdad(paciente.fecha_nacimiento) }} años
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-gender-{{ paciente.sexo.toLowerCase() }} me-2"></i>
+                    {{ paciente.sexo === 'M' ? 'Masculino' : 'Femenino' }}
+                  </div>
+                  <div class="info-item" *ngIf="paciente.email">
+                    <i class="bi bi-envelope me-2"></i>
+                    {{ paciente.email }}
+                  </div>
+                </div>
+              </td>
+              <td class="td-status">
+                <span class="status-badge" [ngClass]="paciente.activo ? 'status-active' : 'status-inactive'">
+                  <i class="bi" [ngClass]="paciente.activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                  {{ paciente.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="td-date">
+                <div class="date-info">
+                  <div class="date-primary">{{ paciente.fecha_creacion | date:'dd/MM/yyyy' }}</div>
+                  <div class="date-secondary">{{ paciente.fecha_creacion | date:'HH:mm' }}</div>
+                </div>
+              </td>
+              <td class="td-actions">
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-action btn-view" 
+                    (click)="verHistorial(paciente.id)"
+                    title="Ver historial"
+                  >
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button 
+                    class="btn btn-action btn-edit" 
+                    [routerLink]="['/medico/pacientes/editar', paciente.id]"
+                    title="Editar"
+                  >
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button 
+                    class="btn btn-action btn-medical" 
+                    (click)="nuevaConsulta(paciente.id)"
+                    title="Nueva consulta"
+                  >
+                    <i class="bi bi-file-medical"></i>
+                  </button>
+                  <button 
+                    class="btn btn-action btn-calendar" 
+                    (click)="agendarCita(paciente.id)"
+                    title="Agendar cita"
+                  >
+                    <i class="bi bi-calendar-plus"></i>
+                  </button>
+                  <button 
+                    class="btn btn-action btn-delete" 
+                    (click)="eliminarPaciente(paciente.id)"
+                    title="Eliminar"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

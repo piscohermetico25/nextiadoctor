@@ -1,4 +1,4 @@
-<div class="admin-layout">
+<div class="medico-layout">
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
@@ -9,13 +9,12 @@
         </div>
       </div>
       <h4 class="brand-title">{{ systemName }}</h4>
-      <p class="brand-subtitle">Luis Javier Casiano Ramos</p>
-      <p class="brand-subtitle">Administrador</p>
+      <p class="brand-subtitle">Dr. Luis Javier Casiano</p>
+      <p class="brand-subtitle">Médico Especialista</p>
       <div class="brand-badge">
-        <i class="bi bi-shield-check-fill"></i>
-        <span>admin&#64;nextiadoctor.com</span>
+        <i class="bi bi-stethoscope"></i>
+        <span>medico&#64;nextiadoctor.com</span>
       </div>
-      
     </div>
 
 
@@ -24,7 +23,7 @@
       <div class="menu-section">
         <h6 class="menu-title">
           <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-          Módulos Principales
+          Módulos Médicos
         </h6>
         <ul class="nav flex-column">
           <li class="nav-item" *ngFor="let item of menuItems">
@@ -32,7 +31,7 @@
               class="nav-link" 
               [routerLink]="[item.route]" 
               routerLinkActive="active"
-              [routerLinkActiveOptions]="{exact: item.route === '/admin'}"
+              [routerLinkActiveOptions]="{exact: item.route === '/medico'}"
             >
               <div class="nav-link-content">
                 <div class="nav-icon-wrapper">
@@ -40,7 +39,7 @@
                 </div>
                 <div class="nav-text">
                   <span class="nav-label">{{ item.label }}</span>
-                  <small class="nav-badge badge {{ item.badgeColor }}">{{ item.badge }}</small>
+                  <small class="nav-badge {{ item.badgeColor }}">{{ item.badge }}</small>
                 </div>
               </div>
               <i class="bi bi-chevron-right nav-arrow"></i>

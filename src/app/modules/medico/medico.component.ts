@@ -11,47 +11,40 @@ interface MenuItem {
 }
 
 @Component({
-  selector: 'app-admin',
+  selector: 'app-medico',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './admin.component.html',
-  styleUrl: './admin.component.scss'
+  templateUrl: './medico.component.html',
+  styleUrl: './medico.component.scss'
 })
-export class AdminComponent {
+export class MedicoComponent {
   // Información del sistema
   systemVersion = '2.1.4';
   systemName = 'NextiaDoctor';
   buildDate = new Date('2024-01-15');
   
-  // Elementos del menú con iconos mejorados
+  // Elementos del menú con iconos médicos
   menuItems: MenuItem[] = [
     { 
       label: 'Dashboard', 
       icon: 'bi-speedometer2', 
-      route: '/admin',
+      route: '/medico',
       badge: 'Principal',
       badgeColor: 'medical-primary'
     },
     { 
-      label: 'IPRESS', 
-      icon: 'bi-building-fill', 
-      route: '/admin/ipress',
+      label: 'Pacientes', 
+      icon: 'bi-person-hearts', 
+      route: '/medico/pacientes',
       badge: 'Gestión',
-      badgeColor: 'medical-info'
-    },
-    { 
-      label: 'Usuarios', 
-      icon: 'bi-people-fill', 
-      route: '/admin/usuarios',
-      badge: 'Admin',
       badgeColor: 'medical-success'
     },
     { 
-      label: 'Médicos', 
-      icon: 'bi-clipboard2-pulse-fill', 
-      route: '/admin/medicos',
-      badge: 'Clínico',
-      badgeColor: 'medical-primary'
+      label: 'Agenda', 
+      icon: 'bi-calendar-check', 
+      route: '/medico/agenda',
+      badge: 'Citas',
+      badgeColor: 'medical-info'
     }
   ];
   

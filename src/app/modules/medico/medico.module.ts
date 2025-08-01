@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MedicoRoutingModule } from './medico-routing.module';
+import { MedicoComponent } from './medico.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 
@@ -10,6 +11,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
   imports: [
     CommonModule,
     MedicoRoutingModule,
+    MedicoComponent,
     DashboardComponent
   ]
 })

@@ -1,0 +1,291 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="isEditMode ? 'Editar Paciente' : 'Nuevo Paciente'"
+  [subtitle]="isEditMode ? 'Actualiza la información del paciente seleccionado' : 'Registra un nuevo paciente en el sistema médico'"
+  icon="bi-person-plus"
+  actionType="back"
+  actionRoute="/medico/pacientes"
+  actionText="Volver a Pacientes"
+  actionIcon="bi bi-arrow-left"
+  primaryColor="#28a745"
+  secondaryColor="#1e7e34"
+  [showAction]="true">
+</app-page-header>
+
+<div class="container-fluid">
+  <div class="container">
+
+    <!-- Form Card -->
+    <div class="form-card">
+
+      <div class="card-body">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Cargando información del paciente...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="error-container">
+          <div class="error-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h4 class="error-title">Error al cargar</h4>
+          <p class="error-message">{{ error }}</p>
+          <button class="btn btn-retry" (click)="ngOnInit()">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Reintentar
+          </button>
+        </div>
+        <form [formGroup]="pacienteForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+          <!-- Información Personal -->
+          <div class="form-section">
+            <div class="section-header">
+              <h3 class="section-title">
+                <i class="bi bi-person-fill me-2"></i>
+                Información Personal
+              </h3>
+              <p class="section-description">Datos básicos de identificación del paciente</p>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="nombre" class="form-label">Nombre Completo *</label>
+                  <input
+                    type="text"
+                    id="nombre"
+                    class="form-control-modern"
+                    formControlName="nombre"
+                    placeholder="Ingrese el nombre completo"
+                    [class.is-invalid]="isFieldInvalid('nombre')"
+                  >
+                  <div *ngIf="isFieldInvalid('nombre')" class="invalid-feedback">
+                    <div *ngIf="pacienteForm.get('nombre')?.errors?.['required']">El nombre es requerido</div>
+                    <div *ngIf="pacienteForm.get('nombre')?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="documentoIdentidad" class="form-label">Documento de Identidad *</label>
+                  <input
+                    type="text"
+                    id="documentoIdentidad"
+                    class="form-control-modern"
+                    formControlName="documentoIdentidad"
+                    placeholder="Ingrese el DNI o documento"
+                    [class.is-invalid]="isFieldInvalid('documentoIdentidad')"
+                  >
+                  <div *ngIf="isFieldInvalid('documentoIdentidad')" class="invalid-feedback">
+                    <div *ngIf="pacienteForm.get('documentoIdentidad')?.errors?.['required']">El documento es requerido</div>
+                    <div *ngIf="pacienteForm.get('documentoIdentidad')?.errors?.['pattern']">Formato de documento inválido</div>
+                  </div>
+                </div>
+          </div>
+
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-6">
+                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                <input
+                  type="date"
+                  id="fechaNacimiento"
+                  class="form-control-modern"
+                  formControlName="fechaNacimiento"
+                  [class.is-invalid]="isFieldInvalid('fechaNacimiento')"
+                >
+                <div *ngIf="isFieldInvalid('fechaNacimiento')" class="invalid-feedback">
+                  <div *ngIf="pacienteForm.get('fechaNacimiento')?.errors?.['required']">La fecha de nacimiento es requerida</div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="sexo" class="form-label">Sexo *</label>
+                <select
+                  id="sexo"
+                  class="form-control-modern"
+                  formControlName="sexo"
+                  [class.is-invalid]="isFieldInvalid('sexo')"
+                >
+                  <option value="">Seleccione...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+                <div *ngIf="isFieldInvalid('sexo')" class="invalid-feedback">
+                  <div *ngIf="pacienteForm.get('sexo')?.errors?.['required']">El sexo es requerido</div>
+            </div>
+          </div>
+        </div>
+
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label class="form-label">Edad</label>
+                <div class="form-control-plaintext edad-display">
+                  {{ calcularEdad() || 'No calculada' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <!-- Información de Contacto -->
+          <div class="form-section">
+            <div class="section-header">
+              <h3 class="section-title">
+                <i class="bi bi-telephone-fill me-2"></i>
+                Información de Contacto
+              </h3>
+              <p class="section-description">Datos de contacto y ubicación del paciente</p>
+            </div>
+
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input
+                    type="tel"
+                    id="telefono"
+                    class="form-control-modern"
+                    formControlName="telefono"
+                    placeholder="Ingrese el número de teléfono"
+                    [class.is-invalid]="isFieldInvalid('telefono')"
+                  >
+                  <div *ngIf="isFieldInvalid('telefono')" class="invalid-feedback">
+                    <div *ngIf="pacienteForm.get('telefono')?.errors?.['pattern']">Formato de teléfono inválido</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="email" class="form-label">Correo Electrónico</label>
+                  <input
+                    type="email"
+                    id="email"
+                    class="form-control-modern"
+                    formControlName="email"
+                    placeholder="Ingrese el correo electrónico"
+                    [class.is-invalid]="isFieldInvalid('email')"
+                  >
+                  <div *ngIf="isFieldInvalid('email')" class="invalid-feedback">
+                    <div *ngIf="pacienteForm.get('email')?.errors?.['email']">Formato de email inválido</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12">
+                  <label for="direccion" class="form-label">Dirección</label>
+                  <textarea
+                    id="direccion"
+                    class="form-control-modern"
+                    formControlName="direccion"
+                    rows="3"
+                    placeholder="Ingrese la dirección completa"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+          <!-- Información Médica -->
+          <div class="form-section">
+            <div class="section-header">
+              <h3 class="section-title">
+                <i class="bi bi-heart-pulse-fill me-2"></i>
+                Información Médica
+              </h3>
+              <p class="section-description">Datos médicos relevantes del paciente</p>
+            </div>
+
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="tipoSangre" class="form-label">Tipo de Sangre</label>
+                  <select
+                    id="tipoSangre"
+                    class="form-control-modern"
+                    formControlName="tipoSangre"
+                  >
+                    <option value="">Seleccione tipo de sangre</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="alergias" class="form-label">Alergias Conocidas</label>
+                  <textarea
+                    id="alergias"
+                    class="form-control-modern"
+                    formControlName="alergias"
+                    rows="3"
+                    placeholder="Describa las alergias conocidas (opcional)"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="medicamentosActuales" class="form-label">Medicamentos Actuales</label>
+                  <textarea
+                    id="medicamentosActuales"
+                    class="form-control-modern"
+                    formControlName="medicamentosActuales"
+                    rows="3"
+                    placeholder="Liste los medicamentos que toma actualmente (opcional)"
+                  ></textarea>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="antecedentesMedicos" class="form-label">Antecedentes Médicos</label>
+                  <textarea
+                    id="antecedentesMedicos"
+                    class="form-control-modern"
+                    formControlName="antecedentesMedicos"
+                    rows="3"
+                    placeholder="Describa los antecedentes médicos relevantes (opcional)"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <div class="d-flex justify-content-between">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              [routerLink]="['/medico/pacientes']"
+            >
+              <i class="bi bi-arrow-left me-2"></i>
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="pacienteForm.invalid || loading"
+            >
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <i *ngIf="!loading" class="bi bi-check-lg me-2"></i>
+              {{ isEditMode ? 'Actualizar Paciente' : 'Registrar Paciente' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>

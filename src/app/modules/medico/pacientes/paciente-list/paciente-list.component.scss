@@ -1,0 +1,748 @@
+// Variables
+$primary-color: #28a745;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+$border-color: #e9ecef;
+$text-muted: #6c757d;
+$border-radius: 12px;
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$transition: all 0.3s ease;
+
+.pacientes-container {
+  padding: 0;
+  background-color: #f8f9fc;
+  min-height: 100vh;
+
+  // Filters Section
+  .filters-section {
+    margin-bottom: 2rem;
+    
+    .filters-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e9ecef;
+      
+      .filter-group {
+        .filter-label {
+          font-weight: 600;
+          color: #28a745;
+          margin-bottom: 0.5rem;
+          display: block;
+          font-size: 0.9rem;
+        }
+        
+        .form-select-modern {
+          border: 2px solid #e9ecef;
+          border-radius: 0.5rem;
+          padding: 0.75rem 1rem;
+          font-size: 0.95rem;
+          transition: all 0.3s ease;
+          background-color: white;
+          
+          &:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+            outline: none;
+          }
+        }
+        
+        .search-input-group {
+          position: relative;
+          
+          .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 2;
+          }
+          
+          .search-input {
+            border: 2px solid #e9ecef;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: white;
+            
+            &:focus {
+              border-color: #28a745;
+              box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+              outline: none;
+            }
+            
+            &::placeholder {
+              color: #6c757d;
+              font-style: italic;
+            }
+          }
+        }
+        
+        .btn-clear-filters {
+          background: transparent;
+          border: 2px solid #e9ecef;
+          color: #6c757d;
+          padding: 0.75rem 1rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          width: 100%;
+          
+          &:hover {
+            background: #6c757d;
+            color: white;
+            border-color: #6c757d;
+          }
+        }
+      }
+    }
+  }
+}
+
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+  }
+}
+
+.filters-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  border: none;
+
+  .card-header {
+    background: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+
+    h5 {
+      margin: 0;
+      color: #5a5c69;
+      font-weight: 600;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+.search-filters {
+  .row {
+    align-items: end;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+
+    label {
+      font-weight: 600;
+      color: #5a5c69;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      border: 1px solid #d1d3e2;
+      border-radius: 0.35rem;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      transition: all 0.15s ease-in-out;
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      }
+    }
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 0.35rem;
+    transition: all 0.15s ease-in-out;
+
+    &.btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+      }
+    }
+
+    &.btn-outline-secondary {
+      border-color: #d1d3e2;
+      color: #5a5c69;
+
+      &:hover {
+        background-color: #f8f9fc;
+        border-color: #5a5c69;
+      }
+    }
+  }
+}
+
+.actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .btn-group {
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 0.35rem;
+      margin-right: 0.5rem;
+      transition: all 0.15s ease-in-out;
+
+      &.btn-success {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        border: none;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(28, 200, 138, 0.3);
+        }
+      }
+
+      &.btn-info {
+        background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+        border: none;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(54, 185, 204, 0.3);
+        }
+      }
+
+      &.btn-warning {
+        background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+        border: none;
+        color: white;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(246, 194, 62, 0.3);
+        }
+      }
+    }
+  }
+
+  .results-info {
+    color: #5a5c69;
+    font-weight: 600;
+  }
+}
+
+// Table Styles
+.patients-table-container {
+  .table-card {
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    overflow: hidden;
+    border: 1px solid $border-color;
+    
+    .table-responsive {
+      .table-modern {
+        margin: 0;
+        
+        thead {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          
+          th {
+            border: none;
+            padding: 1.25rem 1rem;
+            font-weight: 700;
+            color: $primary-color;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            
+            &.th-patient { width: 30%; }
+            &.th-info { width: 25%; }
+            &.th-status { width: 15%; }
+            &.th-date { width: 15%; }
+            &.th-actions { width: 15%; text-align: center; }
+          }
+        }
+        
+        tbody {
+          tr.patient-row {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: $transition;
+            
+            &:hover {
+              background: rgba(40, 167, 69, 0.02);
+              transform: translateY(-1px);
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            td {
+              border: none;
+              padding: 1.25rem 1rem;
+              vertical-align: middle;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.patient-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .patient-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, $primary-color 0%, #1e7e34 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    flex-shrink: 0;
+  }
+
+  .patient-details {
+    flex: 1;
+    min-width: 0;
+
+    .patient-name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: $dark-color;
+    }
+
+    .patient-document {
+      color: $text-muted;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .patient-phone {
+      color: $text-muted;
+      font-size: 0.85rem;
+      
+      i {
+        color: $success-color;
+      }
+    }
+  }
+}
+
+// Info Details
+.info-details {
+  .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: $text-muted;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    i {
+      color: $primary-color;
+      width: 16px;
+    }
+  }
+}
+
+.patient-contact {
+  font-size: 0.875rem;
+  color: #5a5c69;
+  
+  .contact-item {
+    margin-bottom: 0.25rem;
+    
+    i {
+      width: 16px;
+      margin-right: 0.5rem;
+      color: #858796;
+    }
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  
+  &.status-active {
+    background: linear-gradient(135deg, $success-color 0%, #20c997 100%);
+    color: white;
+  }
+  
+  &.status-inactive {
+    background: linear-gradient(135deg, $danger-color 0%, #fd7e14 100%);
+    color: white;
+  }
+}
+
+// Date Info
+.date-info {
+  .date-primary {
+    font-weight: 600;
+    color: $dark-color;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .date-secondary {
+    color: $text-muted;
+    font-size: 0.8rem;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+
+  .btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition;
+    font-size: 0.9rem;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    &.btn-view {
+      background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+      }
+    }
+    
+    &.btn-edit {
+      background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #e0a800 0%, #d39e00 100%);
+      }
+    }
+    
+    &.btn-medical {
+      background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+      }
+    }
+    
+    &.btn-calendar {
+      background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #5a32a3 0%, #4e2a8e 100%);
+      }
+    }
+    
+    &.btn-delete {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+      }
+    }
+  }
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .pagination-info {
+    color: #5a5c69;
+    font-weight: 600;
+  }
+
+  .pagination {
+    margin: 0;
+
+    .page-item {
+      .page-link {
+        border: 1px solid #d1d3e2;
+        color: #5a5c69;
+        padding: 0.5rem 0.75rem;
+        margin: 0 0.125rem;
+        border-radius: 0.25rem;
+        transition: all 0.15s ease-in-out;
+
+        &:hover {
+          background-color: #f8f9fc;
+          border-color: #667eea;
+          color: #667eea;
+        }
+      }
+
+      &.active .page-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+      }
+
+      &.disabled .page-link {
+        color: #858796;
+        background-color: #f8f9fc;
+        border-color: #e3e6f0;
+      }
+    }
+  }
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  
+  .loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1.5rem;
+  }
+  
+  .loading-text {
+    color: $secondary-color;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Error State
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  
+  .error-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, $danger-color 0%, #e74c3c 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    
+    i {
+      font-size: 2rem;
+      color: white;
+    }
+  }
+  
+  .error-title {
+    color: $danger-color;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+  }
+  
+  .error-message {
+    color: $secondary-color;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  
+  .empty-content {
+    i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    h5 {
+      color: $dark-color;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    p {
+      color: $text-muted;
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .pacientes-container {
+    .filters-section {
+      .filters-card {
+        padding: 1rem;
+      }
+      
+      .row {
+        .col-md-4,
+        .col-md-6,
+        .col-md-2 {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+    
+    .patients-table-container {
+      .table-responsive {
+        .patient-info {
+          flex-direction: column;
+          text-align: center;
+          gap: 0.5rem;
+          
+          .patient-avatar {
+            width: 40px;
+            height: 40px;
+          }
+        }
+        
+        .action-buttons {
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+      }
+    }
+  }
+  
+  .loading-container,
+  .error-container,
+  .empty-state {
+    padding: 2rem 1rem;
+    
+    .error-icon {
+      width: 60px;
+      height: 60px;
+      
+      i {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .pacientes-container {
+    .filters-section {
+      .filters-card {
+        padding: 0.75rem;
+      }
+    }
+    
+    .patients-table-container {
+      .table-card {
+        .table-responsive {
+          .table-modern {
+            thead th {
+              padding: 0.75rem 0.5rem;
+              font-size: 0.8rem;
+            }
+            
+            tbody td {
+              padding: 0.75rem 0.5rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
